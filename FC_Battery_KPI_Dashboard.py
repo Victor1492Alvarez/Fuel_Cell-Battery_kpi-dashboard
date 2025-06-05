@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from io import BytesIO
 from fpdf import FPDF
+import os
 
 # Sample appliance dataset
 appliance_defaults = [
@@ -16,7 +17,7 @@ appliance_defaults = [
 ]
 
 st.set_page_config(page_title="EFOY Hybrid Power System Dashboard", layout="wide")
-st.title("🔋 Fuel Cell & Battery System KPI Dashboard")
+st.title("🔋 EFOY Hybrid System KPI Dashboard")
 st.write("Analyze key performance indicators of the EFOY Pro 2800 + Li 105 system.")
 
 # Sidebar inputs
@@ -27,7 +28,7 @@ for app in appliance_defaults:
     hours = st.sidebar.slider(f"{app['name']} Usage (hours/day)", 0.0, 24.0, float(app['hours']), 0.5)
     custom_appliances.append({"name": app['name'], "power": app['power'], "hours": hours})
 
-methanol_available = st.sidebar.selectbox("Methanol Tank Setup", [("1 × M10 (10Liters)", 10), ("2 × M10 (20Liters)", 20), ("1 × M5 (5Liters)", 5)], index=1)
+methanol_available = st.sidebar.selectbox("Methanol Tank Setup", [("1 × M10 (10L)", 10), ("2 × M10 (20L)", 20), ("1 × M5 (5L)", 5)], index=1)
 selected_tank_liters = methanol_available[1]
 
 peak_power = st.sidebar.slider("⚡ Peak Load (W)", 0, 3000, 997)
@@ -72,6 +73,16 @@ if fuel_cell_energy > 0:
 
 st.pyplot(fig)
 
+# Save plot to a buffer
+img_buffer = BytesIO()
+fig.savefig(img_buffer, format='png')
+img_buffer.seek(0)
+
+# Save image to disk for PDF use
+temp_image_path = "/tmp/chart.png"
+with open(temp_image_path, "wb") as f:
+    f.write(img_buffer.getvalue())
+
 # 📄 PDF Export
 st.markdown("### 📥 Export KPIs as PDF")
 if st.button("Generate PDF Report"):
@@ -86,6 +97,8 @@ if st.button("Generate PDF Report"):
     pdf.cell(200, 10, txt=f"Battery-Only Runtime: {battery_autonomy_hours:.1f} h", ln=True)
     pdf.cell(200, 10, txt=f"System Efficiency: {efficiency_pct*100:.1f}%", ln=True)
     pdf.cell(200, 10, txt=f"Peak Load Coverage: {peak_coverage_pct:.1f}%", ln=True)
+
+    pdf.image(temp_image_path, x=10, y=None, w=180)
 
     pdf_output = BytesIO()
     pdf.output(pdf_output)
