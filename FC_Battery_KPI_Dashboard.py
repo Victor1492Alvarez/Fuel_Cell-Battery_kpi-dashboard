@@ -100,6 +100,6 @@ if st.button("Generate PDF Report"):
 
     pdf.image(temp_image_path, x=10, y=None, w=180)
 
-    pdf_output = BytesIO()
-    pdf.output(pdf_output)
-    st.download_button("📤 Download Report", data=pdf_output.getvalue(), file_name="efoy_kpi_report.pdf", mime="application/pdf")
+    pdf_output = pdf.output(dest='S').encode('latin1')
+    st.download_button("📤 Download Report", data=pdf_output, file_name="efoy_kpi_report.pdf", mime="application/pdf")
+
