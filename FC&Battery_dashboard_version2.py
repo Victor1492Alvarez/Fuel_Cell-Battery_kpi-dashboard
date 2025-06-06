@@ -37,7 +37,7 @@ winter_appliances = [
 st.set_page_config(page_title="EFOY Hybrid System KPI Dashboard", layout="wide")
 st.title("🔋 EFOY Hybrid System KPI Dashboard")
 
-with st.expander("ℹ️ Click to learn how this simulation works"):
+with st.expander("ℹ️ Click here to learn how this simulation works"):
     st.markdown("""
     This tool calculates key performance indicators (KPIs) for a hybrid energy system combining:
     - A **Direct Methanol Fuel Cell (EFOY Pro 2800)**
@@ -83,8 +83,8 @@ k6.metric("🚀 Peak Load Coverage", f"{peak_coverage_pct:.1f}%")
 battery_energy = min(BATTERY_CAPACITY_WH, daily_demand_wh)
 fuel_cell_energy = max(0, daily_demand_wh - BATTERY_CAPACITY_WH)
 fig, ax = plt.subplots(figsize=(6, 4))
-ax.bar("Daily Energy", battery_energy, label="Battery", color="#4CAF50")
-ax.bar("Daily Energy", fuel_cell_energy, bottom=battery_energy, label="Fuel Cell", color="#2196F3")
+ax.bar("Daily Energy", battery_energy, label="Battery", color="#2196F3")
+ax.bar("Daily Energy", fuel_cell_energy, bottom=battery_energy, label="Fuel Cell", color="#4CAF50")
 ax.set_ylabel("Energy (Wh)")
 ax.set_title("Battery vs Fuel Cell Contribution")
 ax.legend()
