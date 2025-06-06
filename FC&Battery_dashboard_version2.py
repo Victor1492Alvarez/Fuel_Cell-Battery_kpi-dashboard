@@ -47,7 +47,8 @@ with st.expander("ℹ️ Click here to learn how this simulation works"):
     - 🌞 **Summer** (low lighting/heating needs)
     - ❄️ **Winter** (longer usage, heating control active)
 
-    > All values are simulated for educational purposes.
+    Click on upper left corner to display the Menu and customize your Devices!. 
+    All values are simulated for educational purposes.
     """)
 
 st.sidebar.header("☞ Click to customize your devices")
