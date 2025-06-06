@@ -5,7 +5,7 @@ import pandas as pd
 from io import BytesIO
 from fpdf import FPDF
 import os
-st.set_page_config(page_title="EFOY Hybrid System KPI Dashboard", layout="wide")
+#st.set_page_config(page_title="EFOY Hybrid System KPI Dashboard", layout="wide")
 
 st.markdown("""
     <div style="display: flex; align-items: center;">
