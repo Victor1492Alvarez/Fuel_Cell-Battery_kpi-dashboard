@@ -2,3 +2,4 @@ streamlit
 matplotlib
 fpdf
 pandas
+Pillow
