@@ -7,6 +7,7 @@ from io import BytesIO
 from fpdf import FPDF
 import base64
 import os
+import requests
 
 # --- Seasonal appliance profiles ---
 summer_appliances = [
@@ -36,7 +37,7 @@ winter_appliances = [
 st.set_page_config(page_title="EFOY Hybrid Power System Dashboard", layout="wide")
 st.title("🔋 EFOY Hybrid System KPI Dashboard")
 
-with st.expander("ℹ️ Click to learn how this simulation works"):
+with st.expander("ℹ️ Click here to learn how this simulation works"):
     st.markdown("""
     This tool calculates key performance indicators (KPIs) for a hybrid energy system combining:
     - A **Direct Methanol Fuel Cell (EFOY Pro 2800)**
@@ -74,6 +75,31 @@ battery_autonomy_hours = battery_discharge_time(daily_demand_wh)
 efficiency_pct = min(system_efficiency(daily_demand_wh / 1000, methanol_per_day), 1.0)
 peak_coverage_pct = peak_load_coverage(peak_power)
 
+# --- KPIs Section ---
+st.markdown("### 📊 Key Performance Indicators")
+kpi1, kpi2, kpi3 = st.columns(3)
+kpi1.metric("🔋 Daily Energy Demand", f"{daily_demand_wh:.0f} Wh")
+kpi2.metric("🧪 Methanol Needed/Day", f"{methanol_per_day:.2f} L")
+kpi3.metric("🛢️ Tank Autonomy", f"{autonomy_days:.1f} days")
+
+kpi4, kpi5, kpi6 = st.columns(3)
+kpi4.metric("⚡ Battery-Only Runtime", f"{battery_autonomy_hours:.1f} h")
+kpi5.metric("🌱 System Efficiency", f"{efficiency_pct*100:.1f}%")
+kpi6.metric("🚀 Peak Load Coverage", f"{peak_coverage_pct:.1f}%")
+
+# --- Chart ---
+st.markdown("### 📈 Energy Contribution per Source (Daily Estimate)")
+battery_energy = min(BATTERY_CAPACITY_WH, daily_demand_wh)
+fuel_cell_energy = max(0, daily_demand_wh - BATTERY_CAPACITY_WH)
+
+fig, ax = plt.subplots(figsize=(6, 4))
+ax.bar("Daily Energy", battery_energy, label="Battery", color="#4CAF50")
+ax.bar("Daily Energy", fuel_cell_energy, bottom=battery_energy, label="Fuel Cell", color="#2196F3")
+ax.set_ylabel("Energy (Wh)")
+ax.set_title("Battery vs Fuel Cell Contribution")
+ax.legend()
+st.pyplot(fig)
+
 # --- Appliance Summary Table ---
 st.markdown("### 🧾 Appliance Energy Summary")
 summary_df = pd.DataFrame(custom_appliances)
@@ -93,30 +119,20 @@ st.table(constants)
 # --- PDF Export ---
 st.markdown("### 📥 Export PDF Report")
 if st.button("📤 Generate PDF Report"):
-    fig, ax = plt.subplots(figsize=(6, 4))
-    battery_energy = min(BATTERY_CAPACITY_WH, daily_demand_wh)
-    fuel_cell_energy = max(0, daily_demand_wh - BATTERY_CAPACITY_WH)
-    ax.bar("Daily Energy", battery_energy, label="Battery", color="#4CAF50")
-    ax.bar("Daily Energy", fuel_cell_energy, bottom=battery_energy, label="Fuel Cell", color="#2196F3")
-    ax.set_ylabel("Energy (Wh)")
-    ax.set_title("Battery vs Fuel Cell Contribution")
-    ax.legend()
-    img_buffer = BytesIO()
-    fig.savefig(img_buffer, format="png")
-    img_buffer.seek(0)
+    # Download header images dynamically
+    camper_url = "https://cdn.pixabay.com/photo/2017/03/27/14/56/caravan-2179408_1280.jpg"
+    alps_url = "https://cdn.pixabay.com/photo/2020/03/17/15/12/alps-4940073_1280.jpg"
+    with open("camper.png", "wb") as f:
+        f.write(requests.get(camper_url).content)
+    with open("alps.png", "wb") as f:
+        f.write(requests.get(alps_url).content)
 
-    with open("temp_chart.png", "wb") as f:
-        f.write(img_buffer.getbuffer())
+    fig.savefig("temp_chart.png")
 
-    # --- PDF Creation ---
     pdf = FPDF()
     pdf.add_page()
-
-    # Insert header images
-    if os.path.exists("camper.png"):
-        pdf.image("camper.png", x=10, y=8, w=40)
-    if os.path.exists("alps.png"):
-        pdf.image("alps.png", x=150, y=8, w=50)
+    pdf.image("camper.png", x=10, y=8, w=40)
+    pdf.image("alps.png", x=150, y=8, w=50)
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(200, 40, txt="EFOY Hybrid Power System Report", ln=True, align='C')
 
@@ -128,7 +144,6 @@ if st.button("📤 Generate PDF Report"):
     pdf.cell(200, 10, txt=f"Battery-Only Runtime: {battery_autonomy_hours:.1f} h", ln=True)
     pdf.cell(200, 10, txt=f"System Efficiency: {efficiency_pct*100:.1f}%", ln=True)
     pdf.cell(200, 10, txt=f"Peak Load Coverage: {peak_coverage_pct:.1f}%", ln=True)
-
     pdf.image("temp_chart.png", x=10, y=None, w=180)
 
     pdf.ln(5)
@@ -150,7 +165,7 @@ if st.button("📤 Generate PDF Report"):
     pdf.multi_cell(0, 10, txt="Report generated for educational purposes - Task 2: Camping Truck.\nServus! Enjoy your spring weekend in the Alps 🏕️")
 
     pdf_output = BytesIO()
-    pdf.output(pdf_output, dest='S').encode('latin1')
+    pdf_output.write(pdf.output(dest='S').encode('latin1'))
     st.download_button("📩 Download PDF", data=pdf_output.getvalue(), file_name="efoy_kpi_report.pdf", mime="application/pdf")
 
 # --- Footer message ---
