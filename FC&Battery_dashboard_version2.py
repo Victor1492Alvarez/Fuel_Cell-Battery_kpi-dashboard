@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from io import BytesIO
 from fpdf import FPDF
-import requests
-from PIL import Image
+import os
 
 # --- Seasonal appliance profiles ---
 summer_appliances = [
@@ -104,25 +103,12 @@ st.table(constants)
 
 st.markdown("### 📥 Export PDF Report")
 if st.button("📤 Generate PDF Report"):
-    camper_url = "https://cdn.pixabay.com/photo/2017/03/27/14/56/caravan-2179408_1280.jpg"
-    alps_url = "https://cdn.pixabay.com/photo/2020/03/17/15/12/alps-4940073_1280.jpg"
-        camper_response = requests.get(camper_url)
-    alps_response = requests.get(alps_url)
 
-    if camper_response.status_code == 200 and alps_response.status_code == 200:
-        camper_img = Image.open(BytesIO(camper_response.content))
-        alps_img = Image.open(BytesIO(alps_response.content))
-    else:
-        st.error("⚠️ Failed to load one or both images from the web. Please check your internet connection or try again later.")
-        st.stop()
-    camper_img.save("camper.png", format="PNG")
-    alps_img.save("alps.png", format="PNG")
+    # Guardar la gráfica temporal
     fig.savefig("temp_chart.png")
 
     pdf = FPDF()
     pdf.add_page()
-    pdf.image("camper.png", x=10, y=8, w=40)
-    pdf.image("alps.png", x=150, y=8, w=50)
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(200, 40, txt="EFOY Hybrid Power System Report", ln=True, align='C')
     pdf.set_font("Arial", size=12)
@@ -133,6 +119,8 @@ if st.button("📤 Generate PDF Report"):
     pdf.cell(200, 10, txt=f"Battery-Only Runtime: {battery_autonomy_hours:.1f} h", ln=True)
     pdf.cell(200, 10, txt=f"System Efficiency: {efficiency_pct*100:.1f}%", ln=True)
     pdf.cell(200, 10, txt=f"Peak Load Coverage: {peak_coverage_pct:.1f}%", ln=True)
+
+    # Insertar solo la gráfica
     pdf.image("temp_chart.png", x=10, y=None, w=180)
 
     pdf.ln(5)
@@ -157,8 +145,6 @@ if st.button("📤 Generate PDF Report"):
     pdf_output.write(pdf.output(dest='S').encode('latin1'))
     st.download_button("📩 Download PDF", data=pdf_output.getvalue(), file_name="efoy_kpi_report.pdf", mime="application/pdf")
 
-    # Optional: clean up temporary files
-    import os
-    for temp_file in ["camper.png", "alps.png", "temp_chart.png"]:
-        if os.path.exists(temp_file):
-            os.remove(temp_file)
+    # Limpiar archivo temporal
+    if os.path.exists("temp_chart.png"):
+        os.remove("temp_chart.png")
