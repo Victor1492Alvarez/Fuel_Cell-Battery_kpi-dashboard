@@ -5,10 +5,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from io import BytesIO
 from fpdf import FPDF
-import base64
-import os
 import requests
-from PIL import Image  # <-- required for valid PNG conversion
+from PIL import Image
 
 # --- Seasonal appliance profiles ---
 summer_appliances = [
@@ -33,8 +31,6 @@ winter_appliances = [
     {"name": "Phone Charger", "power": 5, "hours": 2},
     {"name": "Diesel Heating Controller", "power": 40, "hours": 10}
 ]
-
-# ... (rest of the code remains unchanged until the PDF generation block) ...
 
 # --- PDF Export ---
 st.markdown("### 📥 Export PDF Report")
