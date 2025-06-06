@@ -44,7 +44,7 @@ winter_appliances = [
     {"name": "Diesel Heating Controller", "power": 40, "hours": 10}
 ]
 
-st.title("🔋 EFOY Hybrid System KPI Dashboard")
+#st.title("🔋 EFOY Hybrid System KPI Dashboard")
 
 with st.expander("ℹ️ Click here to learn how this simulation works"):
     st.markdown("""
