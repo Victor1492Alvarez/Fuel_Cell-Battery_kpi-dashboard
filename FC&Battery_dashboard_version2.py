@@ -10,7 +10,7 @@ import os
 st.markdown("""
     <div style="display: flex; align-items: center;">
         <h1 style="margin: 0;">🔋 EFOY Hybrid System KPI Dashboard</h1>
-        <img src="https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png" width="80" style="margin-left: 10px;" />
+        <img src="https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png" width="160" style="margin-left: 10px;" />
     </div>
     """, unsafe_allow_html=True)
 
