@@ -5,6 +5,7 @@ import pandas as pd
 from io import BytesIO
 from fpdf import FPDF
 import os
+
 #st.set_page_config(page_title="Hybrid System KPI Dashboard", layout="wide")
 
 st.markdown("""
@@ -13,8 +14,6 @@ st.markdown("""
         <img src="https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png" width="140" style="margin-left: 8px;" />
     </div>
 """, unsafe_allow_html=True)
-
-#st.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", width=120)
 
 # --- Función para limpiar texto no ASCII (como emojis) para PDF ---
 def clean_text(text):
@@ -114,19 +113,36 @@ constants = {
     "Methanol Consumption Rate": "0.9 L/kWh"
 }
 st.table(constants)
+
 if st.button("📤 Generate PDF Report"):
     fig.savefig("temp_chart.png")
 
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=False)
-    pdf.set_font("Arial", 'B', 12)
-    pdf.cell(0, 8, txt=clean_text("🔋 EFOY Hybrid Power System Report"), ln=True, align='C')
+
+    # Insert title and logo side by side in header
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(0, 10, "", ln=True)  # spacing
+
+    # Save current position
+    x_start = pdf.get_x()
+    y_start = pdf.get_y()
+
+    # Title on the left (about 120mm width)
+    pdf.set_xy(10, 10)
+    pdf.cell(120, 10, txt=clean_text("🔋 EFOY Hybrid Power System Report"), ln=0)
+
+    # Logo image on the right
+    logo_width = 40
+    logo_height = 15
+    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", x=pdf.w - logo_width - 10, y=10, w=logo_width, h=logo_height)
+
+    pdf.ln(20)  # move cursor below header
 
     pdf.set_font("Arial", size=9)
     pdf.cell(0, 6, txt=clean_text(f"Season: {season}"), ln=True)
-    
-    pdf.set_font("Arial", size=9)
+
     pdf.cell(0, 6, txt="Key Performance Indicators:", ln=True)
     kpi_data = [
         f"Daily Energy Demand: {daily_demand_wh:.0f} Wh",
@@ -154,7 +170,7 @@ if st.button("📤 Generate PDF Report"):
     pdf.set_font("Arial", "I", 8)
     pdf.multi_cell(0, 5, clean_text("Report generated for educational purposes - Task 2: Camping Truck. Servus! Enjoy your spring weekend in the Alps 🏕️"))
 
-    # Image: Resize it to fit compactly
+    # Insert chart below content
     y_before = pdf.get_y()
     if y_before < 210:  # if space left on page
         pdf.image("temp_chart.png", x=10, y=pdf.get_y(), w=pdf.w - 20)
@@ -165,4 +181,3 @@ if st.button("📤 Generate PDF Report"):
 
     if os.path.exists("temp_chart.png"):
         os.remove("temp_chart.png")
-
