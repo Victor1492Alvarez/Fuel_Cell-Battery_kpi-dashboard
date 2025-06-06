@@ -135,7 +135,7 @@ if st.button("📤 Generate PDF Report"):
 
     # Logo image on the right
     logo_width = 40
-    logo_height = 15
+    logo_height = 40
     pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", x=pdf.w - logo_width - 10, y=10, w=logo_width, h=logo_height)
 
     pdf.ln(20)  # move cursor below header
