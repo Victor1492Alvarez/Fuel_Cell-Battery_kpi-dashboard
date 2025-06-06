@@ -6,7 +6,7 @@ from io import BytesIO
 from fpdf import FPDF
 import os
 st.set_page_config(page_title="EFOY Hybrid System KPI Dashboard", layout="wide")
-st.image("https://raw.githubusercontent.com/<Victor1492Alvarez>/<Fuel_Cell-Battery_kpi-dashboard>/main/dashboard_logo.png", width=120)
+st.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", width=120)
 
 # --- Función para limpiar texto no ASCII (como emojis) para PDF ---
 def clean_text(text):
