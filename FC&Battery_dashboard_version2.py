@@ -103,42 +103,50 @@ constants = {
     "Methanol Consumption Rate": "0.9 L/kWh"
 }
 st.table(constants)
-
-st.markdown("### 📥 Export PDF Report")
 if st.button("📤 Generate PDF Report"):
     fig.savefig("temp_chart.png")
 
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_font("Arial", 'B', 14)
-    pdf.cell(200, 10, txt=clean_text("🔋 EFOY Hybrid Power System Report"), ln=True, align='C')
-    pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, txt=clean_text(f"Season Selected: {season}"), ln=True)
-    pdf.cell(200, 10, txt=f"Daily Energy Demand: {daily_demand_wh:.0f} Wh", ln=True)
-    pdf.cell(200, 10, txt=f"Methanol Needed/Day: {methanol_per_day:.2f} L", ln=True)
-    pdf.cell(200, 10, txt=f"Tank Autonomy: {autonomy_days:.1f} days", ln=True)
-    pdf.cell(200, 10, txt=f"Battery-Only Runtime: {battery_autonomy_hours:.1f} h", ln=True)
-    pdf.cell(200, 10, txt=f"System Efficiency: {efficiency_pct*100:.1f}%", ln=True)
-    pdf.cell(200, 10, txt=f"Peak Load Coverage: {peak_coverage_pct:.1f}%", ln=True)
-    pdf.image("temp_chart.png", x=10, y=None, w=180)
+    pdf.set_auto_page_break(auto=False)
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(0, 8, txt=clean_text("🔋 EFOY Hybrid Power System Report"), ln=True, align='C')
 
-    pdf.ln(5)
-    pdf.set_font("Arial", size=10)
-    pdf.cell(200, 10, txt="Appliance Summary:", ln=True)
-    for _, row in summary_df.iterrows():
-        line = f"- {row['name']}: {row['power']} W × {row['hours']} h = {row['Energy (Wh)']:.0f} Wh"
-        pdf.cell(200, 8, txt=clean_text(line), ln=True)
+    pdf.set_font("Arial", size=9)
+    pdf.cell(0, 6, txt=clean_text(f"Season: {season}"), ln=True)
+    
+    pdf.set_font("Arial", size=9)
+    pdf.cell(0, 6, txt="Key Performance Indicators:", ln=True)
+    kpi_data = [
+        f"Daily Energy Demand: {daily_demand_wh:.0f} Wh",
+        f"Methanol Needed/Day: {methanol_per_day:.2f} L",
+        f"Tank Autonomy: {autonomy_days:.1f} days",
+        f"Battery-Only Runtime: {battery_autonomy_hours:.1f} h",
+        f"System Efficiency: {efficiency_pct*100:.1f}%",
+        f"Peak Load Coverage: {peak_coverage_pct:.1f}%"
+    ]
+    for item in kpi_data:
+        pdf.cell(0, 5, txt=item, ln=True)
 
-    pdf.ln(5)
-    pdf.set_font("Arial", "B", 10)
-    pdf.cell(200, 10, txt="System Constants:", ln=True)
-    pdf.set_font("Arial", size=10)
-    for key, val in constants.items():
-        pdf.cell(200, 8, txt=f"- {key}: {val}", ln=True)
+    pdf.ln(3)
+    pdf.cell(0, 6, txt="Appliance Summary (W × h = Wh):", ln=True)
+    for row in summary_df.itertuples(index=False):
+        line = f"- {row.name}: {row.power} × {row.hours:.1f} = {row._3:.0f}"
+        pdf.cell(0, 5, txt=clean_text(line), ln=True)
 
-    pdf.ln(10)
-    pdf.set_font("Arial", "I", 9)
-    pdf.multi_cell(0, 10, clean_text("Report generated for educational purposes - Task 2: Camping Truck.\nServus! Enjoy your spring weekend in the Alps 🏕️"))
+    pdf.ln(3)
+    pdf.cell(0, 6, txt="System Constants:", ln=True)
+    for k, v in constants.items():
+        pdf.cell(0, 5, txt=f"- {k}: {v}", ln=True)
+
+    pdf.ln(2)
+    pdf.set_font("Arial", "I", 8)
+    pdf.multi_cell(0, 5, clean_text("Report generated for educational purposes - Task 2: Camping Truck. Servus! Enjoy your spring weekend in the Alps 🏕️"))
+
+    # Image: Resize it to fit compactly
+    y_before = pdf.get_y()
+    if y_before < 210:  # if space left on page
+        pdf.image("temp_chart.png", x=10, y=pdf.get_y(), w=pdf.w - 20)
 
     pdf_output = BytesIO()
     pdf_output.write(pdf.output(dest='S').encode('latin1'))
@@ -146,3 +154,4 @@ if st.button("📤 Generate PDF Report"):
 
     if os.path.exists("temp_chart.png"):
         os.remove("temp_chart.png")
+
