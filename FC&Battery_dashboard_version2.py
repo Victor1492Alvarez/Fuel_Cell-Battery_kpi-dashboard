@@ -39,6 +39,7 @@ st.title("🔋 EFOY Hybrid System KPI Dashboard")
 
 with st.expander("ℹ️ Click here to learn how this simulation works"):
     st.markdown("""
+    Welcome to our Interactive KPI Dashboard!.
     This tool calculates key performance indicators (KPIs) for a hybrid energy system combining:
     - A **Direct Methanol Fuel Cell (EFOY Pro 2800)**
     - A **LiFePO₄ Battery (EFOY Li 105)**
@@ -48,7 +49,7 @@ with st.expander("ℹ️ Click here to learn how this simulation works"):
     - ❄️ **Winter** (longer usage, heating control active)
 
     Click on upper left corner to display the Menu and customize your Devices!. 
-    All values are simulated for educational purposes.
+    All values are simulated for educational purposes as a part of our Case of Study: Task No.2
     """)
 
 st.sidebar.header("☞ Click to customize your devices")
