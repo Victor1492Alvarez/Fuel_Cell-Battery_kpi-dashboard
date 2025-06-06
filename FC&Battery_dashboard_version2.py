@@ -106,8 +106,15 @@ st.markdown("### 📥 Export PDF Report")
 if st.button("📤 Generate PDF Report"):
     camper_url = "https://cdn.pixabay.com/photo/2017/03/27/14/56/caravan-2179408_1280.jpg"
     alps_url = "https://cdn.pixabay.com/photo/2020/03/17/15/12/alps-4940073_1280.jpg"
-    camper_img = Image.open(BytesIO(requests.get(camper_url).content))
-    alps_img = Image.open(BytesIO(requests.get(alps_url).content))
+        camper_response = requests.get(camper_url)
+    alps_response = requests.get(alps_url)
+
+    if camper_response.status_code == 200 and alps_response.status_code == 200:
+        camper_img = Image.open(BytesIO(camper_response.content))
+        alps_img = Image.open(BytesIO(alps_response.content))
+    else:
+        st.error("⚠️ Failed to load one or both images from the web. Please check your internet connection or try again later.")
+        st.stop()
     camper_img.save("camper.png", format="PNG")
     alps_img.save("alps.png", format="PNG")
     fig.savefig("temp_chart.png")
@@ -149,3 +156,9 @@ if st.button("📤 Generate PDF Report"):
     pdf_output = BytesIO()
     pdf_output.write(pdf.output(dest='S').encode('latin1'))
     st.download_button("📩 Download PDF", data=pdf_output.getvalue(), file_name="efoy_kpi_report.pdf", mime="application/pdf")
+
+    # Optional: clean up temporary files
+    import os
+    for temp_file in ["camper.png", "alps.png", "temp_chart.png"]:
+        if os.path.exists(temp_file):
+            os.remove(temp_file)
