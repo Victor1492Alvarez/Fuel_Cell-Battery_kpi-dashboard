@@ -5,7 +5,7 @@ import pandas as pd
 from io import BytesIO
 from fpdf import FPDF
 import os
-
+st.image("https://raw.githubusercontent.com/<Victor1492Alvarez>/<Fuel_Cell-Battery_kpi-dashboard>/main/dashboard_logo.png", width=120)
 # --- Función para limpiar texto no ASCII (como emojis) para PDF ---
 def clean_text(text):
     return ''.join(c for c in text if ord(c) < 128)
