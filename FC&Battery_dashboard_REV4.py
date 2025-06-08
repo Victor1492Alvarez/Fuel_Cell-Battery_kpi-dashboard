@@ -201,8 +201,8 @@ if st.button("📤 Generate PDF Report"):
 
     # Gráficos
     pdf.ln(3)
-    pdf.image("temp_chart.png", x=10, y=160, w=90)
-    pdf.image("temp_gauge.png", x=110, y=160, w=90)
+    pdf.image("temp_chart.png", x=10, y=200, w=90)
+    pdf.image("temp_gauge.png", x=110, y=200, w=90)
 
     # Gauge interpretation
     pdf.set_xy(10, 245)
@@ -211,7 +211,7 @@ if st.button("📤 Generate PDF Report"):
 Gauge Interpretation:
 - Red (<20%): Potential inefficient methanol use or consumption overestimation.
 - Yellow (20–50%): Normal operation.
-- Green (>50%): Battery-only use or overestimated input.
+- Green (>50%): Battery-only use.
 """
     pdf.multi_cell(0, 4, clean_text(interpretation))
 
