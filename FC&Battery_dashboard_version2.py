@@ -133,7 +133,7 @@ with st.expander("Click to view all KPI calculation formulas"):
     V_{MeOH/day} = \frac{E_{daily}}{1000} \times 0.9  
     \]  
     
-    <h1>🛢️ Tank Autonomy</h6>  
+    <h6>🛢️ Tank Autonomy</h6>  
     \[  
     A_{tank} = \frac{V_{tank}}{V_{MeOH/day}}  
     \]  
