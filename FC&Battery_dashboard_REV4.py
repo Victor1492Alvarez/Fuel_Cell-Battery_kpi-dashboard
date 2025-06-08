@@ -110,13 +110,16 @@ with col2:
         }
     ))
     fig_gauge.update_layout(height=350, margin=dict(t=0, b=0, l=0, r=0))
-    st.plotly_chart(fig_gauge, use_container_width=True)
-    st.caption("""
-    🔍 Gauge interpretation:
-    - <20% (🔴): Potential inefficient methanol use or overestimated load.
-    - 20–50% (🟡): Normal functional range.
-    - >50% (🟢): Possibly battery-only supply.
+  st.plotly_chart(fig_gauge, use_container_width=True)
+
+with st.expander("📘 How to interpret the Global Efficiency Gauge"):
+    st.markdown("""
+    **Gauge Zones Explained**  
+    - 🔴 **< 20% (Red):** Indicates poor efficiency. The fuel cell might be oversized, or methanol usage may be higher than necessary.  
+    - 🟡 **20–50% (Yellow):** Acceptable range. Indicates the system is working within a normal operational window.  
+    - 🟢 **> 50% (Green):** Very efficient use. Often suggests battery-only operation or optimistically low energy needs.
     """)
+
 
 st.markdown("### 🧾 Energy Summary based on Devices")
 summary_df = pd.DataFrame(custom_appliances)
@@ -212,7 +215,7 @@ if st.button("📤 Generate PDF Report"):
     interpretation = """
 Gauge Interpretation:
 - Red (<20%): Potential inefficient methanol use or consumption overestimation.
-- Yellow (20–50%): Normal operation.
+- Yellow (20%--50%): Normal operation.
 - Green (>50%): Battery-only use.
 """
     pdf.multi_cell(0, 4, clean_text(interpretation))
