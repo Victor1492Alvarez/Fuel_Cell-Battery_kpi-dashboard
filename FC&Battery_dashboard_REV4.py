@@ -207,7 +207,7 @@ if st.button("📤 Generate PDF Report"):
     pdf.image("temp_gauge.png", x=110, y=197, w=90)
 
     # Gauge interpretation
-    pdf.set_xy(10, 260)
+    pdf.set_xy(10, 250)
     pdf.set_font("Arial", size=10)
     interpretation = """
 Gauge Interpretation:
@@ -218,7 +218,7 @@ Gauge Interpretation:
     pdf.multi_cell(0, 4, clean_text(interpretation))
 
     # Footer
-    pdf.set_y(-45)
+    pdf.set_y(-30)
     pdf.set_font("Arial", 'I', 8)
     pdf.multi_cell(0, 5, clean_text("Thank you for using our app.\nServus! And enjoy your camping days in the Alps!"))
 
