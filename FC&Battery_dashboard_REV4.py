@@ -53,7 +53,7 @@ with st.expander("ℹ️ Click here to learn how this simulation works"):
     - 🌞 **Summer**
     - ❄️ **Winter**
 
-    Click on the upper-left corner to customize your appliances!  
+    Click on the upper-left corner to customize your devices!  
     All values are simulated for educational purposes (Task No. 2).
     """)
 
@@ -135,9 +135,9 @@ with col2:
     with st.expander("📘 How to interpret the Global Efficiency Gauge"):
         st.markdown("""
         **Gauge Zones Explained**  
-        - 🔴 **< 20% (Red):** Indicates poor efficiency. The fuel cell might be oversized, or methanol usage may be higher than necessary.  
-        - 🟡 **20–50% (Yellow):** Acceptable range. Indicates the system is working within a normal operational window.  
-        - 🟢 **> 50% (Green):** Very efficient use. Often suggests battery-only operation or optimistically low energy needs.
+        - 🔴 **< 20% (Red): Indicates poor efficiency. The fuel cell might be oversized, or methanol usage may be higher than necessary.  
+        - 🟡 **20–50% (Yellow): Acceptable range. Indicates the system is working within a normal operational window.  
+        - 🟢 **> 50% (Green): Very efficient use. Often suggests battery-only operation or the energy needs were underestimated.
         """)
 
 summary_df = pd.DataFrame(custom_appliances)
