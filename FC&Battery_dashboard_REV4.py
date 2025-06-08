@@ -118,7 +118,7 @@ with col2:
     - >50% (🟢): Possibly battery-only supply.
     """)
 
-st.markdown("### 🧾 Appliance Energy Summary")
+st.markdown("### 🧾 Energy Summary based on Devices")
 summary_df = pd.DataFrame(custom_appliances)
 summary_df["Energy (Wh)"] = summary_df["power"] * summary_df["hours"]
 st.dataframe(summary_df.style.format({"power": "{:.0f} W", "hours": "{:.2f} h", "Energy (Wh)": "{:.0f}"}))
@@ -132,7 +132,7 @@ constants = {
 }
 st.table(constants)
 
-with st.expander("📘 KPI Formulas"):
+with st.expander("📘 What are the KPI Formulas about?"):
     st.markdown("""
     <small>
     - **Daily Energy Demand** = Σ(Power × Hours) of all devices<br>
@@ -216,7 +216,7 @@ Gauge Interpretation:
     pdf.multi_cell(0, 4, clean_text(interpretation))
 
     # Footer
-    pdf.set_y(-20)
+    pdf.set_y(-30)
     pdf.set_font("Arial", 'I', 8)
     pdf.multi_cell(0, 5, clean_text("Thank you for using our app.\nServus! And enjoy your camping days in the Alps!"))
 
