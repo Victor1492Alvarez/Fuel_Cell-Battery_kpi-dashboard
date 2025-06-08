@@ -161,7 +161,7 @@ if st.button("📤 Generate PDF Report"):
     try:
         logo_width = 40
         logo_height = 40
-        pdf.image("dashboard_logo.png", x=160, y=4,w=logo_width, h=logo_height)
+        pdf.image("dashboard_logo.png", x=165, y=4,w=logo_width, h=logo_height)
     except:
         pass
 
@@ -184,10 +184,10 @@ if st.button("📤 Generate PDF Report"):
 """
     pdf.multi_cell(0, 5, clean_text(kpi_text))
 
-    # Appliance Summary
+    # Energy Summary based on Devices
     pdf.ln(2)
     pdf.set_font("Arial", 'B', 10)
-    pdf.cell(0, 6, "Appliance Energy Summary", ln=True)
+    pdf.cell(0, 6, "Energy Summary based on Devices", ln=True)
     pdf.set_font("Arial", size=9)
     for _, row in summary_df.iterrows():
         appliance_text = f"- {row['name']}: {row['power']} W × {row['hours']:.2f} h = {row['Energy (Wh)']:.0f} Wh"
