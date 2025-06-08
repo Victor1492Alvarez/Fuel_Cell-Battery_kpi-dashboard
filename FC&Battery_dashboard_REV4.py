@@ -159,7 +159,9 @@ if st.button("📤 Generate PDF Report"):
     pdf.cell(0, 10, clean_text("Key Performance Indicators Report - Summary"), ln=True)
 
     try:
-        pdf.image("dashboard_logo.png", x=170, y=10, w=30)
+        logo_width = 40
+        logo_height = 40
+        pdf.image("dashboard_logo.png", x=170, y=10, w=30,w=logo_width, h=logo_height)
     except:
         pass
 
