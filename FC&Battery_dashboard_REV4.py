@@ -113,7 +113,7 @@ with col2:
   st.plotly_chart(fig_gauge, use_container_width=True)
 
 with st.expander("📘 How to interpret the Global Efficiency Gauge"):
-    st.markdown("""
+        st.markdown("""
     **Gauge Zones Explained**  
     - 🔴 **< 20% (Red):** Indicates poor efficiency. The fuel cell might be oversized, or methanol usage may be higher than necessary.  
     - 🟡 **20–50% (Yellow):** Acceptable range. Indicates the system is working within a normal operational window.  
