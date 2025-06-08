@@ -5,6 +5,7 @@ import pandas as pd
 from io import BytesIO
 from fpdf import FPDF
 import os
+import tempfile
 
 #st.set_page_config(page_title="Hybrid System KPI Dashboard", layout="wide")
 
@@ -92,13 +93,35 @@ k6.metric("🚀 Peak Load Coverage", f"{peak_coverage_pct:.1f}%")
 
 battery_energy = min(BATTERY_CAPACITY_WH, daily_demand_wh)
 fuel_cell_energy = max(0, daily_demand_wh - BATTERY_CAPACITY_WH)
-fig, ax = plt.subplots(figsize=(6, 4))
-ax.bar("Daily Energy", battery_energy, label="Battery", color="#2196F3")
-ax.bar("Daily Energy", fuel_cell_energy, bottom=battery_energy, label="Fuel Cell", color="#4CAF50")
-ax.set_ylabel("Energy (Wh)")
-ax.set_title("Battery vs Fuel Cell Contribution")
-ax.legend()
-st.pyplot(fig)
+
+# --- Gráfico 1: Battery vs Fuel Cell ---
+fig1, ax1 = plt.subplots(figsize=(5, 4))
+ax1.bar("Daily Energy", battery_energy, label="Battery", color="#2196F3")
+ax1.bar("Daily Energy", fuel_cell_energy, bottom=battery_energy, label="Fuel Cell", color="#4CAF50")
+ax1.set_ylabel("Energy (Wh)")
+ax1.set_title("Battery vs Fuel Cell Contribution")
+ax1.legend()
+
+# --- Gráfico 2: Eficiencia y Cobertura ---
+fig2, ax2 = plt.subplots(figsize=(5, 4))
+metrics = ['System Efficiency (%)', 'Peak Load Coverage (%)']
+values = [efficiency_pct * 100, peak_coverage_pct]
+bars = ax2.bar(metrics, values, color=['#4CAF50', '#2196F3'])
+ax2.set_ylim(0, 110)
+ax2.set_title("Efficiency and Peak Load Coverage")
+for bar in bars:
+    height = bar.get_height()
+    ax2.annotate(f'{height:.1f}%',
+                 xy=(bar.get_x() + bar.get_width() / 2, height),
+                 xytext=(0, 3), textcoords="offset points",
+                 ha='center', va='bottom')
+
+# Mostrar los dos gráficos en la app en columnas horizontales
+col1, col2 = st.columns(2)
+with col1:
+    st.pyplot(fig1)
+with col2:
+    st.pyplot(fig2)
 
 st.markdown("### 🧾 Appliance Energy Summary")
 summary_df = pd.DataFrame(custom_appliances)
@@ -157,9 +180,15 @@ with st.expander("Click to view all KPI calculation formulas"):
     \end{cases}  
     \]  
     """, unsafe_allow_html=True)
+
 #---PDF Generator code---
 if st.button("📤 Generate PDF Report"):
-    fig.savefig("temp_chart.png")
+    # Guardar gráficos en archivos temporales
+    temp_dir = tempfile.gettempdir()
+    chart1_path = os.path.join(temp_dir, "chart1.png")
+    chart2_path = os.path.join(temp_dir, "chart2.png")
+    fig1.savefig(chart1_path, bbox_inches='tight')
+    fig2.savefig(chart2_path, bbox_inches='tight')
 
     pdf = FPDF()
     pdf.add_page()
@@ -170,17 +199,14 @@ if st.button("📤 Generate PDF Report"):
     pdf.cell(0, 10, "", ln=True)  # spacing
 
     # Save current position
-    x_start = pdf.get_x()
-    y_start = pdf.get_y()
-
-    # Title on the left (about 120mm width)
     pdf.set_xy(10, 10)
     pdf.cell(120, 10, txt=clean_text("🔋 EFOY Hybrid Power System Report"), ln=0)
 
     # Logo image on the right
     logo_width = 40
     logo_height = 40
-    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", x=pdf.w - logo_width - 10, y=10, w=logo_width, h=logo_height)
+    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png",
+              x=pdf.w - logo_width - 10, y=10, w=logo_width, h=logo_height)
 
     pdf.ln(20)  # move cursor below header
 
@@ -210,18 +236,22 @@ if st.button("📤 Generate PDF Report"):
     for k, v in constants.items():
         pdf.cell(0, 5, txt=f"- {k}: {v}", ln=True)
 
+    pdf.ln(3)
+    # Insertar gráficos uno debajo del otro
+    pdf.image(chart1_path, x=10, y=pdf.get_y(), w=pdf.w - 20)
+    pdf.ln(85)  # dejar espacio para la imagen anterior
+    pdf.image(chart2_path, x=10, y=pdf.get_y(), w=pdf.w - 20)
+
     pdf.ln(2)
     pdf.set_font("Arial", "I", 8)
     pdf.multi_cell(0, 5, clean_text("Report generated for educational purposes - Task 2: Camping Truck. Servus! Enjoy your spring weekend in the Alps 🏕️"))
-
-    # Insert chart below content
-    y_before = pdf.get_y()
-    if y_before < 210:  # if space left on page
-        pdf.image("temp_chart.png", x=10, y=pdf.get_y(), w=pdf.w - 20)
 
     pdf_output = BytesIO()
     pdf_output.write(pdf.output(dest='S').encode('latin1'))
     st.download_button("📩 Download PDF", data=pdf_output.getvalue(), file_name="efoy_kpi_report.pdf", mime="application/pdf")
 
-    if os.path.exists("temp_chart.png"):
-        os.remove("temp_chart.png")
+    # Limpiar archivos temporales
+    if os.path.exists(chart1_path):
+        os.remove(chart1_path)
+    if os.path.exists(chart2_path):
+        os.remove(chart2_path)
