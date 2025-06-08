@@ -149,19 +149,95 @@ with st.expander("📘 KPI Formulas"):
 if st.button("📤 Generate PDF Report"):
     fig.savefig("temp_chart.png")
     fig_gauge.write_image("temp_gauge.png")
+    logo_path = "dashboard_logo.png"
 
-    pdf = FPDF()
+    pdf = FPDF(orientation='L', unit='mm', format='A4')
     pdf.add_page()
-    pdf.set_font("Arial", size=10)
-    pdf.multi_cell(95, 5, f"Key Performance Indicators:\n- Energy Demand: {daily_demand_wh:.0f} Wh\n- Methanol/day: {methanol_per_day:.2f} L\n- Autonomy: {autonomy_days:.1f} days\n- Battery Runtime: {battery_autonomy_hours:.1f} h\n- Efficiency: {global_efficiency*100:.1f}%\n- Peak Coverage: {peak_coverage_pct:.1f}%", border=0)
-    pdf.set_xy(105, 10)
-    pdf.multi_cell(95, 5, "Appliance Summary:\n" + "\n".join([f"{row['name']}: {row['power']} W × {row['hours']:.1f} h = {row['Energy (Wh)']:.0f} Wh" for _, row in summary_df.iterrows()]), border=0)
-    pdf.image("temp_chart.png", x=10, y=80, w=90)
-    pdf.image("temp_gauge.png", x=110, y=80, w=90)
+    pdf.set_auto_page_break(auto=False)
+    pdf.set_font("Arial", "B", 14)
+    
+    # Header
+    pdf.cell(0, 10, "Hybrid System KPI Executive Report", ln=1, align="L")
+    if os.path.exists(logo_path):
+        pdf.image(logo_path, x=260, y=5, w=30)
 
+    pdf.set_font("Arial", "", 10)
+    pdf.set_y(20)
+    pdf.multi_cell(0, 5, "This is the result of your simulation. Values generated for educational and academic purposes only.", align="L")
+
+    # KPI Table
+    pdf.set_font("Arial", "B", 11)
+    pdf.ln(4)
+    pdf.cell(0, 8, "Key Performance Indicators", ln=1)
+    pdf.set_font("Arial", "", 10)
+    pdf.cell(95, 6, f"🔋 Daily Energy Demand: {daily_demand_wh:.0f} Wh")
+    pdf.cell(95, 6, f"🧪 Methanol Needed/Day: {methanol_per_day:.2f} L")
+    pdf.cell(95, 6, f"🛢️ Tank Autonomy: {autonomy_days:.1f} days", ln=1)
+    pdf.cell(95, 6, f"⚡ Battery-Only Runtime: {battery_autonomy_hours:.1f} h")
+    pdf.cell(95, 6, f"🌱 System Efficiency: {global_efficiency * 100:.1f}%")
+    pdf.cell(95, 6, f"🚀 Peak Load Coverage: {peak_coverage_pct:.1f}%", ln=1)
+
+    # Appliance Summary Table
+    pdf.ln(6)
+    pdf.set_font("Arial", "B", 11)
+    pdf.cell(0, 8, "Appliance Energy Summary", ln=1)
+    pdf.set_font("Arial", "B", 9)
+    pdf.cell(50, 6, "Device", 1)
+    pdf.cell(35, 6, "Power (W)", 1)
+    pdf.cell(35, 6, "Hours", 1)
+    pdf.cell(40, 6, "Energy (Wh)", 1, ln=1)
+    pdf.set_font("Arial", "", 9)
+    for app in custom_appliances:
+        pdf.cell(50, 6, app['name'], 1)
+        pdf.cell(35, 6, f"{app['power']:.0f}", 1)
+        pdf.cell(35, 6, f"{app['hours']:.2f}", 1)
+        energy = app['power'] * app['hours']
+        pdf.cell(40, 6, f"{energy:.0f}", 1, ln=1)
+
+    # System Constants Table
+    pdf.ln(6)
+    pdf.set_font("Arial", "B", 11)
+    pdf.cell(0, 8, "System Constants", ln=1)
+    pdf.set_font("Arial", "", 9)
+    for k, v in constants.items():
+        pdf.cell(70, 6, k, 1)
+        pdf.cell(60, 6, v, 1, ln=1)
+
+    # Graphs
+    pdf.ln(3)
+    pdf.image("temp_chart.png", x=10, y=130, w=130)
+    pdf.image("temp_gauge.png", x=150, y=130, w=130)
+
+    # Final message
+       # Final message with interpretation
+    pdf.set_y(190)
+    pdf.set_font("Arial", "B", 10)
+
+    # Interpretación dinámica de la eficiencia
+    efficiency_pct = global_efficiency * 100
+    if efficiency_pct < 20:
+        interpretation_text = "⚠️ Efficiency < 20%: Possible methanol waste or energy overestimation."
+        interpretation_color = (239, 83, 80)  # red
+    elif 20 <= efficiency_pct < 50:
+        interpretation_text = "⚠️ Efficiency between 30–40%: Normal range for DMFC hybrid systems."
+        interpretation_color = (255, 235, 59)  # yellow
+    else:
+        interpretation_text = "✅ Efficiency > 50%: Warning, possible battery-only estimation or input mismatch."
+        interpretation_color = (102, 187, 106)  # green
+
+    pdf.set_text_color(*interpretation_color)
+    pdf.multi_cell(0, 6, interpretation_text, align="C")
+
+    # Footer message
+    pdf.ln(3)
+    pdf.set_text_color(100)
+    pdf.set_font("Arial", "I", 10)
+    pdf.multi_cell(0, 8, "Thanks for using our app.\nThis tool is intended for academic and educational purposes only.\nServus! and enjoy your camping days in the Alps. ⛰️", align="C")
+
+    # Save to streamlit
     pdf_output = BytesIO()
     pdf_output.write(pdf.output(dest='S').encode('latin1'))
-    st.download_button("📩 Download PDF", data=pdf_output.getvalue(), file_name="efoy_kpi_report.pdf", mime="application/pdf")
+    st.download_button("📩 Download PDF", data=pdf_output.getvalue(), file_name="efoy_kpi_executive_report.pdf", mime="application/pdf")
 
     os.remove("temp_chart.png")
     os.remove("temp_gauge.png")
