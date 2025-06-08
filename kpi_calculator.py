@@ -1,4 +1,5 @@
 # kpi_calculator.py
+
 import math
 from typing import List, Dict
 
@@ -35,13 +36,17 @@ def system_efficiency(total_energy_wh: float, methanol_used_l: float) -> float:
     Calculates the efficiency of the fuel cell system by comparing
     the fuel cell's electrical energy output with the chemical energy in the methanol used.
     """
-    if methanol_used_l == 0:
-        return 0.0
     battery_contribution_wh = min(total_energy_wh, BATTERY_CAPACITY_WH)
     fuel_cell_contribution_wh = max(0, total_energy_wh - battery_contribution_wh)
-    fuel_cell_contribution_kwh = fuel_cell_contribution_wh / 1000
-    chemical_energy_kwh = methanol_used_l * 1.1  # 1.1 kWh per liter of methanol (approx LHV)
-    return fuel_cell_contribution_kwh / chemical_energy_kwh
+
+    if fuel_cell_contribution_wh == 0:
+        return 0.0
+
+    fuel_cell_kwh = fuel_cell_contribution_wh / 1000
+    methanol_for_fuel_cell = fuel_cell_kwh * METHANOL_CONSUMPTION_PER_KWH
+    chemical_energy_kwh = methanol_for_fuel_cell * 1.1  # LHV-based approx
+
+    return fuel_cell_kwh / chemical_energy_kwh
 
 def peak_load_coverage(peak_power_w: float) -> float:
     peak_current = peak_power_w / BATTERY_VOLTAGE
