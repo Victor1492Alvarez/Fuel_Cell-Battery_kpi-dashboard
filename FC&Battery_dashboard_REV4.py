@@ -156,7 +156,7 @@ if st.button("📤 Generate PDF Report"):
     # Header
     pdf.set_xy(10, 10)
     pdf.set_font("Arial", 'B', 14)
-    pdf.cell(0, 10, clean_text("Hybrid Energy System Simulation Report"), ln=True)
+    pdf.cell(0, 10, clean_text("Key Performance Indicators Report - Summary"), ln=True)
 
     try:
         pdf.image("dashboard_logo.png", x=165, y=10, w=30)
@@ -206,7 +206,7 @@ if st.button("📤 Generate PDF Report"):
 
     # Gauge interpretation
     pdf.set_xy(10, 245)
-    pdf.set_font("Arial", size=8)
+    pdf.set_font("Arial", size=14)
     interpretation = """
 Gauge Interpretation:
 - Red (<20%): Potential inefficient methanol use or consumption overestimation.
