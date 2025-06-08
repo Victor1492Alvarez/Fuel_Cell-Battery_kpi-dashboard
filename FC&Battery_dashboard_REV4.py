@@ -202,7 +202,7 @@ if st.button("📤 Generate PDF Report"):
     # Gráficos
     pdf.ln(3)
     pdf.image("temp_chart.png", x=10, y=180, w=90)
-    pdf.image("temp_gauge.png", x=110, y=195, w=90)
+    pdf.image("temp_gauge.png", x=110, y=197, w=90)
 
     # Gauge interpretation
     pdf.set_xy(10, 245)
@@ -217,7 +217,7 @@ Gauge Interpretation:
 
     # Footer
     pdf.set_y(-20)
-    pdf.set_font("Arial", 'I', 9)
+    pdf.set_font("Arial", 'I', 8)
     pdf.multi_cell(0, 5, clean_text("Thank you for using our app.\nServus! And enjoy your camping days in the Alps!"))
 
     pdf_output = BytesIO()
