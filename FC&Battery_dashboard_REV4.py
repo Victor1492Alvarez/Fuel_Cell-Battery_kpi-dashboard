@@ -47,6 +47,7 @@ with st.expander("ℹ️ Click here to learn how this simulation works"):
     Welcome to our Interactive KPI Dashboard! This tool calculates key performance indicators (KPIs) for a hybrid energy system combining:
     - A **Direct Methanol Fuel Cell (EFOY Pro 2800)**
     - A **LiFePO₄ Battery (EFOY Li 105)**
+    Click on upper left corner to customize your devives!
     """)
 
 st.sidebar.header("☞ Click to customize your devices")
@@ -118,7 +119,7 @@ with col2:
     ))
 
     fig_gauge.update_layout(
-        height=350,
+        height=340,
         margin=dict(t=60, b=20, l=0, r=0)
     )
 
@@ -126,11 +127,11 @@ with col2:
 
     with st.expander("🧭 Gauge Interpretation"):
         if global_efficiency * 100 < 20:
-            interpretation = "⚠️ Less than 20%: The system may be inefficient or methanol usage is being overestimated."
+            interpretation = "🔴 Less than 20%: The system may be inefficient or methanol usage is being overestimated."
         elif global_efficiency * 100 < 50:
             interpretation = "🟡 Between 20%–50%: Functional system, typical for DMFC hybrid setups."
         else:
-            interpretation = "✅ Above 50%: Likely battery-only energy or overestimated performance."
+            interpretation = "🟢 Above 50%: Likely battery-only energy or overestimated performance."
 
         st.markdown(f"**Interpretation:** {interpretation}")
 summary_df = pd.DataFrame(custom_appliances)
