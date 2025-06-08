@@ -134,7 +134,7 @@ constants = {
 }
 st.table(constants)
 
-with st.expander("📘 KPI Formulas"):
+with st.expander("📘 What are the Formulas in KPIs about?"):
     st.markdown("""
     <small>
     - **Daily Energy Demand** = Σ(Power × Hours) of all devices (user-defined)<br>
