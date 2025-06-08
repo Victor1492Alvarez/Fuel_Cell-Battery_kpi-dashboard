@@ -94,27 +94,38 @@ with col1:
     st.pyplot(fig)
 
 with col2:
-    fig_gauge = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=global_efficiency * 100,
-        title={'text': "Global Efficiency (%)"},
-        gauge={
-            'axis': {'range': [0, 100], 'tickwidth': 1},
-            'bar': {'color': "black"},
-            'steps': [
-                {'range': [0, 20], 'color': "#EF5350"},
-                {'range': [20, 50], 'color': "#FFEB3B"},
-                {'range': [50, 100], 'color': "#66BB6A"}
-            ],
-            'threshold': {
-                'line': {'color': "black", 'width': 4},
-                'thickness': 0.75,
-                'value': global_efficiency * 100
-            }
+   # ----------- Gauge Chart con Título Ajustado -----------
+
+fig_gauge = go.Figure(go.Indicator(
+    mode="gauge+number",
+    value=global_efficiency * 100,
+    title={
+        'text': "Global Efficiency (%)",
+        'font': {'size': 18}
+    },
+    gauge={
+        'axis': {'range': [0, 100], 'tickwidth': 1},
+        'bar': {'color': "black"},
+        'steps': [
+            {'range': [0, 20], 'color': "#EF5350"},   # Red
+            {'range': [20, 50], 'color': "#FFEB3B"},  # Yellow
+            {'range': [50, 100], 'color': "#66BB6A"}  # Green
+        ],
+        'threshold': {
+            'line': {'color': "black", 'width': 4},
+            'thickness': 0.75,
+            'value': global_efficiency * 100
         }
-    ))
-    fig_gauge.update_layout(height=380, margin=dict(t=0, b=0, l=0, r=0))
-    st.plotly_chart(fig_gauge, use_container_width=True)
+    }
+))
+
+# Ajustamos el layout para que el título no se corte
+fig_gauge.update_layout(
+    height=350,
+    margin=dict(t=60, b=20, l=0, r=0)
+)
+
+st.plotly_chart(fig_gauge, use_container_width=True)
 
     with st.expander("📘 How to interpret the Global Efficiency Gauge"):
         st.markdown("""
