@@ -1,12 +1,10 @@
-import streamlit as st
+import streamlit as st 
 from kpi_calculator import *
 import matplotlib.pyplot as plt
 import pandas as pd
 from io import BytesIO
 from fpdf import FPDF
 import os
-
-#st.set_page_config(page_title="Hybrid System KPI Dashboard", layout="wide")
 
 st.markdown("""
     <div style="display: flex; align-items: center; gap: 10px;">
@@ -15,11 +13,10 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# --- Función para limpiar texto no ASCII (como emojis) para PDF ---
 def clean_text(text):
     return ''.join(c for c in text if ord(c) < 128)
 
-# --- Perfiles de consumo estacional ---
+# --- Profiles ---
 summer_appliances = [
     {"name": "Fridge", "power": 45, "hours": 24},
     {"name": "Lights", "power": 10, "hours": 2},
@@ -43,21 +40,19 @@ winter_appliances = [
     {"name": "Diesel Heating Controller", "power": 40, "hours": 10}
 ]
 
-#st.title("🔋 EFOY Hybrid System KPI Dashboard")
-
 with st.expander("ℹ️ Click here to learn how this simulation works"):
     st.markdown("""
-    Welcome to our Interactive KPI Dashboard!.
+    Welcome to our Interactive KPI Dashboard!
     This tool calculates key performance indicators (KPIs) for a hybrid energy system combining:
     - A **Direct Methanol Fuel Cell (EFOY Pro 2800)**
     - A **LiFePO₄ Battery (EFOY Li 105)**
 
     The goal is to estimate energy autonomy and methanol consumption for two seasonal use profiles:
-    - 🌞 **Summer** (low lighting/heating needs)
-    - ❄️ **Winter** (longer usage, heating control active)
+    - 🌞 **Summer**
+    - ❄️ **Winter**
 
-    Click on upper left corner to display the Menu and customize your Devices!. 
-    All values are simulated for educational purposes as a part of our Case of Study: Task No.2
+    Click on the upper-left corner to customize your appliances!  
+    All values are simulated for educational purposes (Task No. 2).
     """)
 
 st.sidebar.header("☞ Click to customize your devices")
@@ -73,25 +68,31 @@ methanol_available = st.sidebar.selectbox("Methanol Tank Setup", [("1 × M10 (10
 selected_tank_liters = methanol_available[1]
 peak_power = st.sidebar.slider("⚡ Peak Load (W)", 0, 3000, 997)
 
+# --- Energy Calculations ---
 daily_demand_wh = calculate_daily_energy_demand(custom_appliances)
-methanol_per_day = calculate_methanol_consumption(daily_demand_wh)
+battery_energy = min(BATTERY_CAPACITY_WH, daily_demand_wh)
+fuel_cell_energy = max(0, daily_demand_wh - BATTERY_CAPACITY_WH)
+fuel_cell_energy_kwh = fuel_cell_energy / 1000
+
+methanol_per_day = calculate_methanol_consumption(fuel_cell_energy)
 autonomy_days = calculate_tank_autonomy(selected_tank_liters, methanol_per_day)
 battery_autonomy_hours = battery_discharge_time(daily_demand_wh)
-efficiency_pct = min(get_system_efficiency_for_app(daily_demand_wh), 1.0)
+fc_efficiency = fuel_cell_efficiency(fuel_cell_energy_kwh, methanol_per_day) * 100
 peak_coverage_pct = peak_load_coverage(peak_power)
 
+# --- KPI Section ---
 st.markdown("### 📊 Key Performance Indicators")
 k1, k2, k3 = st.columns(3)
 k1.metric("🔋 Daily Energy Demand", f"{daily_demand_wh:.0f} Wh")
 k2.metric("🧪 Methanol Needed/Day", f"{methanol_per_day:.2f} L")
 k3.metric("🛢️ Tank Autonomy", f"{autonomy_days:.1f} days")
+
 k4, k5, k6 = st.columns(3)
 k4.metric("⚡ Battery-Only Runtime", f"{battery_autonomy_hours:.1f} h")
-k5.metric("🌱 System Efficiency", f"{efficiency_pct*100:.1f}%")
+k5.metric("🌱 Fuel‑Cell Efficiency", f"{fc_efficiency:.1f}%")
 k6.metric("🚀 Peak Load Coverage", f"{peak_coverage_pct:.1f}%")
 
-battery_energy = min(BATTERY_CAPACITY_WH, daily_demand_wh)
-fuel_cell_energy = max(0, daily_demand_wh - BATTERY_CAPACITY_WH)
+# --- Chart ---
 fig, ax = plt.subplots(figsize=(6, 4))
 ax.bar("Daily Energy", battery_energy, label="Battery", color="#2196F3")
 ax.bar("Daily Energy", fuel_cell_energy, bottom=battery_energy, label="Fuel Cell", color="#4CAF50")
@@ -100,11 +101,13 @@ ax.set_title("Battery vs Fuel Cell Contribution")
 ax.legend()
 st.pyplot(fig)
 
+# --- Appliance Summary ---
 st.markdown("### 🧾 Appliance Energy Summary")
 summary_df = pd.DataFrame(custom_appliances)
 summary_df["Energy (Wh)"] = summary_df["power"] * summary_df["hours"]
 st.dataframe(summary_df.style.format({"power": "{:.0f} W", "hours": "{:.2f} h", "Energy (Wh)": "{:.0f}"}))
 
+# --- Constants Table ---
 st.markdown("### ⚙️ System Constants")
 constants = {
     "Battery Capacity": f"{BATTERY_CAPACITY_WH:.0f} Wh",
@@ -114,6 +117,7 @@ constants = {
 }
 st.table(constants)
 
+# --- PDF Export ---
 if st.button("📤 Generate PDF Report"):
     fig.savefig("temp_chart.png")
 
@@ -121,24 +125,20 @@ if st.button("📤 Generate PDF Report"):
     pdf.add_page()
     pdf.set_auto_page_break(auto=False)
 
-    # Insert title and logo side by side in header
     pdf.set_font("Arial", 'B', 14)
-    pdf.cell(0, 10, "", ln=True)  # spacing
+    pdf.cell(0, 10, "", ln=True)
 
-    # Save current position
     x_start = pdf.get_x()
     y_start = pdf.get_y()
 
-    # Title on the left (about 120mm width)
     pdf.set_xy(10, 10)
     pdf.cell(120, 10, txt=clean_text("🔋 EFOY Hybrid Power System Report"), ln=0)
 
-    # Logo image on the right
     logo_width = 40
     logo_height = 40
     pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", x=pdf.w - logo_width - 10, y=10, w=logo_width, h=logo_height)
 
-    pdf.ln(20)  # move cursor below header
+    pdf.ln(20)
 
     pdf.set_font("Arial", size=9)
     pdf.cell(0, 6, txt=clean_text(f"Season: {season}"), ln=True)
@@ -149,7 +149,7 @@ if st.button("📤 Generate PDF Report"):
         f"Methanol Needed/Day: {methanol_per_day:.2f} L",
         f"Tank Autonomy: {autonomy_days:.1f} days",
         f"Battery-Only Runtime: {battery_autonomy_hours:.1f} h",
-        f"System Efficiency: {efficiency_pct*100:.1f}%",
+        f"Fuel-Cell Efficiency: {fc_efficiency:.1f}%",
         f"Peak Load Coverage: {peak_coverage_pct:.1f}%"
     ]
     for item in kpi_data:
@@ -170,9 +170,7 @@ if st.button("📤 Generate PDF Report"):
     pdf.set_font("Arial", "I", 8)
     pdf.multi_cell(0, 5, clean_text("Report generated for educational purposes - Task 2: Camping Truck. Servus! Enjoy your spring weekend in the Alps 🏕️"))
 
-    # Insert chart below content
-    y_before = pdf.get_y()
-    if y_before < 210:  # if space left on page
+    if pdf.get_y() < 210:
         pdf.image("temp_chart.png", x=10, y=pdf.get_y(), w=pdf.w - 20)
 
     pdf_output = BytesIO()
