@@ -77,7 +77,7 @@ daily_demand_wh = calculate_daily_energy_demand(custom_appliances)
 methanol_per_day = calculate_methanol_consumption(daily_demand_wh)
 autonomy_days = calculate_tank_autonomy(selected_tank_liters, methanol_per_day)
 battery_autonomy_hours = battery_discharge_time(daily_demand_wh)
-efficiency_pct = min(system_efficiency(daily_demand_wh / 1000, methanol_per_day), 1.0)
+efficiency_pct = min(get_system_efficiency_for_app(daily_demand_wh), 1.0)
 peak_coverage_pct = peak_load_coverage(peak_power)
 
 st.markdown("### 📊 Key Performance Indicators")
