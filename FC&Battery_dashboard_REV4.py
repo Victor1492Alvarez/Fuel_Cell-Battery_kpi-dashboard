@@ -120,7 +120,7 @@ with col2:
     fig_gauge.update_layout(height=350, margin=dict(t=0, b=0, l=0, r=0))
     st.plotly_chart(fig_gauge, use_container_width=True)
 
-st.markdown("### 🧾 Appliance Energy Summary")
+st.markdown("### 🧾 Energy Summary based on Devices")
 summary_df = pd.DataFrame(custom_appliances)
 summary_df["Energy (Wh)"] = summary_df["power"] * summary_df["hours"]
 st.dataframe(summary_df.style.format({"power": "{:.0f} W", "hours": "{:.2f} h", "Energy (Wh)": "{:.0f}"}))
