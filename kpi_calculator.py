@@ -52,3 +52,11 @@ def peak_load_coverage(peak_power_w: float) -> float:
         return 100.0
     else:
         return round((200 * BATTERY_VOLTAGE) / peak_power_w * 100, 1)
+
+# Adapted usage for streamlit app
+def get_system_efficiency_for_app(total_energy_wh: float) -> float:
+    """
+    Wrapper para usar system_efficiency correctamente dentro del dashboard Streamlit,
+    sin necesidad de pasar el metanol usado directamente.
+    """
+    return system_efficiency(total_energy_wh)
