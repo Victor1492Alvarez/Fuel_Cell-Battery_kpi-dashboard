@@ -2,6 +2,7 @@ import streamlit as st
 from kpi_calculator import *
 import matplotlib.pyplot as plt
 import pandas as pd
+from kpi_calculator import fuel_cell_efficiency
 from io import BytesIO
 from fpdf import FPDF
 import os
