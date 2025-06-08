@@ -1,5 +1,4 @@
 # kpi_calculator.py
-
 import math
 from typing import List, Dict
 
@@ -36,18 +35,13 @@ def system_efficiency(total_energy_wh: float) -> float:
     Calcula la eficiencia real de la celda de combustible midiendo su aporte energético
     en relación a la energía química del metanol requerido para ese aporte.
     """
-    # Cálculo del aporte de la celda de combustible
     fuel_cell_contribution_wh = max(0, total_energy_wh - BATTERY_CAPACITY_WH)
 
     if fuel_cell_contribution_wh == 0:
         return 0.0
 
     fuel_cell_contribution_kwh = fuel_cell_contribution_wh / 1000
-
-    # Calcular el metanol usado solo para esa fracción
     methanol_for_fuel_cell = fuel_cell_contribution_kwh * METHANOL_CONSUMPTION_PER_KWH
-
-    # Energía química del metanol
     chemical_energy_kwh = methanol_for_fuel_cell * 1.1  # LHV estimado
 
     return fuel_cell_contribution_kwh / chemical_energy_kwh
