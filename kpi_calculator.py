@@ -31,22 +31,26 @@ def battery_discharge_time(energy_wh: float) -> float:
         return float('inf')
     return BATTERY_CAPACITY_WH / energy_wh
 
-def system_efficiency(total_energy_wh: float, methanol_used_l: float) -> float:
+def system_efficiency(total_energy_wh: float) -> float:
     """
-    Calculates the efficiency of the fuel cell system by comparing
-    the fuel cell's electrical energy output with the chemical energy in the methanol used.
+    Calcula la eficiencia real de la celda de combustible midiendo su aporte energético
+    en relación a la energía química del metanol requerido para ese aporte.
     """
-    battery_contribution_wh = min(total_energy_wh, BATTERY_CAPACITY_WH)
-    fuel_cell_contribution_wh = max(0, total_energy_wh - battery_contribution_wh)
+    # Cálculo del aporte de la celda de combustible
+    fuel_cell_contribution_wh = max(0, total_energy_wh - BATTERY_CAPACITY_WH)
 
     if fuel_cell_contribution_wh == 0:
         return 0.0
 
-    fuel_cell_kwh = fuel_cell_contribution_wh / 1000
-    methanol_for_fuel_cell = fuel_cell_kwh * METHANOL_CONSUMPTION_PER_KWH
-    chemical_energy_kwh = methanol_for_fuel_cell * 1.1  # LHV-based approx
+    fuel_cell_contribution_kwh = fuel_cell_contribution_wh / 1000
 
-    return fuel_cell_kwh / chemical_energy_kwh
+    # Calcular el metanol usado solo para esa fracción
+    methanol_for_fuel_cell = fuel_cell_contribution_kwh * METHANOL_CONSUMPTION_PER_KWH
+
+    # Energía química del metanol
+    chemical_energy_kwh = methanol_for_fuel_cell * 1.1  # LHV estimado
+
+    return fuel_cell_contribution_kwh / chemical_energy_kwh
 
 def peak_load_coverage(peak_power_w: float) -> float:
     peak_current = peak_power_w / BATTERY_VOLTAGE
