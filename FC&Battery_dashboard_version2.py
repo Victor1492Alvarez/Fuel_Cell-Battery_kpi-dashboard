@@ -120,7 +120,7 @@ st.markdown("## 📘 KPI Formula Reference")
 
 with st.expander("Click to view all KPI calculation formulas"):
     st.markdown(r"""  
-    <h1>🔋 Daily Energy Demand</h1>  
+    <h6>🔋 Daily Energy Demand</h6>  
     \[  
     E_{daily} = \sum_{i=1}^{n} (P_i \times t_i)  
     \]  
@@ -128,27 +128,27 @@ with st.expander("Click to view all KPI calculation formulas"):
     - \( P_i \): Power of appliance *i* in watts  
     - \( t_i \): Daily usage time of appliance *i* in hours  
     
-    <h1>🧪 Methanol Consumption per Day</h1>  
+    <h6>🧪 Methanol Consumption per Day</h6>  
     \[  
     V_{MeOH/day} = \frac{E_{daily}}{1000} \times 0.9  
     \]  
     
-    <h1>🛢️ Tank Autonomy</h1>  
+    <h1>🛢️ Tank Autonomy</h6>  
     \[  
     A_{tank} = \frac{V_{tank}}{V_{MeOH/day}}  
     \]  
     
-    <h4>⚡ Battery-Only Runtime</h4>  
+    <h6>⚡ Battery-Only Runtime</h6>  
     \[  
     t_{battery} = \frac{C_{battery}}{E_{daily}}  
     \]  
     
-    <h1>🌱 System Efficiency</h1>  
+    <h6>🌱 System Efficiency</h6>  
     \[  
     \eta = \frac{E_{useful}}{E_{chemical}}  
     \]  
     
-    <h1>🚀 Peak Load Coverage</h1>  
+    <h6>🚀 Peak Load Coverage</h6>  
     \[  
     \%Coverage =  
     \begin{cases}  
