@@ -114,74 +114,50 @@ constants = {
 }
 st.table(constants)
 
-# --- KPI Formula Reference Section ---
+#---Formulas Referene---
+
 st.markdown("## 📘 KPI Formula Reference")
 
 with st.expander("Click to view all KPI calculation formulas"):
-    st.markdown(r"""
-### 🔋 Daily Energy Demand
-\[
-E_{daily} = \sum_{i=1}^{n} (P_i \times t_i)
-\]
-Where:  
-- \( P_i \): Power of each device (in watts)  
-- \( t_i \): Daily usage time of each device (in hours)
-
----
-
-### 🧪 Methanol Needed per Day
-\[
-M = \frac{E_{daily}}{1000} \times 0.9
-\]
-Where:  
-- \( E_{daily} \): Total daily energy demand (Wh)  
-- \( 0.9 \): Liters of methanol per kWh (EFOY Pro 2800 spec)
-
----
-
-### 🛢️ Tank Autonomy
-\[
-A = \frac{V_{tank}}{M}
-\]
-Where:  
-- \( V_{tank} \): Total methanol volume available (liters)  
-- \( M \): Daily methanol consumption (liters)
-
----
-
-### ⚡ Battery-Only Runtime
-\[
-R = \frac{C_{battery}}{E_{daily}}
-\]
-Where:  
-- \( C_{battery} \): Battery capacity (Wh)  
-- \( E_{daily} \): Daily energy demand (Wh)
-
----
-
-### 🌱 System Efficiency
-\[
-\eta = \frac{E_{useful}}{E_{chemical}} = \frac{E_{daily}/1000}{L_{methanol} \times 1.1}
-\]
-Where:  
-- \( E_{useful} \): Useful energy delivered to the load (kWh)  
-- \( L_{methanol} \): Liters of methanol used  
-- \( 1.1 \): Approximate energy content per liter of methanol (kWh)
-
----
-
-### 🚀 Peak Load Coverage
-\[
-Coverage = \min \left(100, \frac{P_{max}}{P_{peak}} \times 100 \right)
-\]
-Where:  
-- \( P_{max} = 200 \times 12.8 = 2560 \, W \): Maximum discharge power of battery (at 200A limit)  
-- \( P_{peak} \): User's peak power demand (W)
-
----
-""")
-
-
+    st.markdown(r"""  
+    <h5>🔋 Daily Energy Demand</h5>  
+    \[  
+    E_{daily} = \sum_{i=1}^{n} (P_i \times t_i)  
+    \]  
+    Where:  
+    - \( P_i \): Power of appliance *i* in watts  
+    - \( t_i \): Daily usage time of appliance *i* in hours  
+    
+    <h5>🧪 Methanol Consumption per Day</h5>  
+    \[  
+    V_{MeOH/day} = \frac{E_{daily}}{1000} \times 0.9  
+    \]  
+    
+    <h5>🛢️ Tank Autonomy</h5>  
+    \[  
+    A_{tank} = \frac{V_{tank}}{V_{MeOH/day}}  
+    \]  
+    
+    <h5>⚡ Battery-Only Runtime</h5>  
+    \[  
+    t_{battery} = \frac{C_{battery}}{E_{daily}}  
+    \]  
+    
+    <h5>🌱 System Efficiency</h5>  
+    \[  
+    \eta = \frac{E_{useful}}{E_{chemical}}  
+    \]  
+    
+    <h5>🚀 Peak Load Coverage</h5>  
+    \[  
+    \%Coverage =  
+    \begin{cases}  
+    100\%, & \text{if } I_{peak} \leq 200A \\  
+    \frac{200 \times 12.8}{P_{peak}} \times 100, & \text{otherwise}  
+    \end{cases}  
+    \]  
+    """, unsafe_allow_html=True)
+#---PDF Generator code---
 if st.button("📤 Generate PDF Report"):
     fig.savefig("temp_chart.png")
 
