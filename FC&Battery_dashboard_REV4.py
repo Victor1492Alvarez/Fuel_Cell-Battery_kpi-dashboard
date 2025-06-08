@@ -155,7 +155,7 @@ if st.button("📤 Generate PDF Report"):
 
     # Header
     pdf.set_xy(10, 10)
-    pdf.set_font("Arial", 'B', 14)
+    pdf.set_font("Arial", 'B', 16)
     pdf.cell(0, 10, clean_text("Key Performance Indicators Report - Summary"), ln=True)
 
     try:
@@ -206,7 +206,7 @@ if st.button("📤 Generate PDF Report"):
 
     # Gauge interpretation
     pdf.set_xy(10, 245)
-    pdf.set_font("Arial", size=14)
+    pdf.set_font("Arial", size=10)
     interpretation = """
 Gauge Interpretation:
 - Red (<20%): Potential inefficient methanol use or consumption overestimation.
