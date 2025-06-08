@@ -44,10 +44,17 @@ winter_appliances = [
 
 with st.expander("ℹ️ Click here to learn how this simulation works"):
     st.markdown("""
-    Welcome to our Interactive KPI Dashboard! This tool calculates key performance indicators (KPIs) for a hybrid energy system combining:
+     Welcome to our Interactive KPI Dashboard!
+    This tool calculates key performance indicators (KPIs) for a hybrid energy system combining:
     - A **Direct Methanol Fuel Cell (EFOY Pro 2800)**
     - A **LiFePO₄ Battery (EFOY Li 105)**
-    /tClick on upper left corner to customize your devives!
+
+    The goal is to estimate energy autonomy and methanol consumption for two seasonal use profiles:
+    - 🌞 **Summer**
+    - ❄️ **Winter**
+
+    Click on the upper-left corner to customize your appliances!  
+    All values are simulated for educational purposes (Task No. 2).
     """)
 
 st.sidebar.header("☞ Click to customize your devices")
