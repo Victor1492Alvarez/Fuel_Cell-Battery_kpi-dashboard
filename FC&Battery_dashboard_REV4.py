@@ -94,48 +94,45 @@ with col1:
     st.pyplot(fig)
 
 with col2:
-   # ----------- Gauge Chart con Título Ajustado -----------
-
-fig_gauge = go.Figure(go.Indicator(
-    mode="gauge+number",
-    value=global_efficiency * 100,
-    title={
-        'text': "Global Efficiency (%)",
-        'font': {'size': 18}
-    },
-    gauge={
-        'axis': {'range': [0, 100], 'tickwidth': 1},
-        'bar': {'color': "black"},
-        'steps': [
-            {'range': [0, 20], 'color': "#EF5350"},   # Red
-            {'range': [20, 50], 'color': "#FFEB3B"},  # Yellow
-            {'range': [50, 100], 'color': "#66BB6A"}  # Green
-        ],
-        'threshold': {
-            'line': {'color': "black", 'width': 4},
-            'thickness': 0.75,
-            'value': global_efficiency * 100
+    fig_gauge = go.Figure(go.Indicator(
+        mode="gauge+number",
+        value=global_efficiency * 100,
+        title={
+            'text': "Global Efficiency (%)",
+            'font': {'size': 18}
+        },
+        gauge={
+            'axis': {'range': [0, 100], 'tickwidth': 1},
+            'bar': {'color': "black"},
+            'steps': [
+                {'range': [0, 20], 'color': "#EF5350"},   # Red
+                {'range': [20, 50], 'color': "#FFEB3B"},  # Yellow
+                {'range': [50, 100], 'color': "#66BB6A"}  # Green
+            ],
+            'threshold': {
+                'line': {'color': "black", 'width': 4},
+                'thickness': 0.75,
+                'value': global_efficiency * 100
+            }
         }
-    }
-))
+    ))
 
-# Ajustamos el layout para que el título no se corte
-fig_gauge.update_layout(
-    height=350,
-    margin=dict(t=60, b=20, l=0, r=0)
-)
+    fig_gauge.update_layout(
+        height=350,
+        margin=dict(t=60, b=20, l=0, r=0)
+    )
 
-st.plotly_chart(fig_gauge, use_container_width=True)
+    st.plotly_chart(fig_gauge, use_container_width=True)
 
-    with st.expander("📘 How to interpret the Global Efficiency Gauge"):
-        st.markdown("""
-        **Gauge Zones Explained**  
-        - 🔴 **< 20% (Red):** Indicates poor efficiency. The fuel cell might be oversized, or methanol usage may be higher than necessary.  
-        - 🟡 **20–50% (Yellow):** Acceptable range. Indicates the system is working within a normal operational window.  
-        - 🟢 **> 50% (Green):** Very efficient use. Often suggests battery-only operation or optimistically low energy needs.
-        """)
+    with st.expander("🧭 Gauge Interpretation"):
+        if global_efficiency * 100 < 20:
+            interpretation = "⚠️ Less than 20%: The system may be inefficient or methanol usage is being overestimated."
+        elif global_efficiency * 100 < 50:
+            interpretation = "🟡 Between 20%–50%: Functional system, typical for DMFC hybrid setups."
+        else:
+            interpretation = "✅ Above 50%: Likely battery-only energy or overestimated performance."
 
-st.markdown("### 🧾 Energy Summary based on Devices")
+        st.markdown(f"**Interpretation:** {interpretation}")
 summary_df = pd.DataFrame(custom_appliances)
 summary_df["Energy (Wh)"] = summary_df["power"] * summary_df["hours"]
 st.dataframe(summary_df.style.format({"power": "{:.0f} W", "hours": "{:.2f} h", "Energy (Wh)": "{:.0f}"}))
