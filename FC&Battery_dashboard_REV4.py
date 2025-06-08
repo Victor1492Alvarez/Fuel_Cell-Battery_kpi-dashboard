@@ -12,7 +12,7 @@ st.set_page_config(page_title="Hybrid System KPI Dashboard", layout="wide")
 st.markdown("""
     <div style="display: flex; align-items: center; gap: 10px;">
         <h2 style="margin: 0; font-size: 2em;">🔋Camping Truck System Dashboard</h2>
-        <img src="https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png" width="140" style="margin-left: 8px;" />
+        <img src="https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png" width="140" style="margin-left: 16px;" />
     </div>
 """, unsafe_allow_html=True)
 
