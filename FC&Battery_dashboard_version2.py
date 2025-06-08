@@ -2,12 +2,12 @@ import streamlit as st
 from kpi_calculator import *
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 from io import BytesIO
 from fpdf import FPDF
 import os
-import tempfile
 
-#st.set_page_config(page_title="Hybrid System KPI Dashboard", layout="wide")
+st.set_page_config(page_title="Hybrid System KPI Dashboard", layout="wide")
 
 st.markdown("""
     <div style="display: flex; align-items: center; gap: 10px;">
@@ -16,7 +16,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# --- Función para limpiar texto no ASCII (como emojis) para PDF ---
+# --- Función para limpiar texto no ASCII ---
 def clean_text(text):
     return ''.join(c for c in text if ord(c) < 128)
 
@@ -44,23 +44,7 @@ winter_appliances = [
     {"name": "Diesel Heating Controller", "power": 40, "hours": 10}
 ]
 
-#st.title("🔋 EFOY Hybrid System KPI Dashboard")
-
-with st.expander("ℹ️ Click here to learn how this simulation works"):
-    st.markdown("""
-    Welcome to our Interactive KPI Dashboard!.
-    This tool calculates key performance indicators (KPIs) for a hybrid energy system combining:
-    - A **Direct Methanol Fuel Cell (EFOY Pro 2800)**
-    - A **LiFePO₄ Battery (EFOY Li 105)**
-
-    The goal is to estimate energy autonomy and methanol consumption for two seasonal use profiles:
-    - 🌞 **Summer** (low lighting/heating needs)
-    - ❄️ **Winter** (longer usage, heating control active)
-
-    Click on upper left corner to display the Menu and customize your Devices!. 
-    All values are simulated for educational purposes as a part of our Case of Study: Task No.2
-    """)
-
+# Sidebar Inputs
 st.sidebar.header("☞ Click to customize your devices")
 season = st.sidebar.radio("Select Season", ["🌞 Summer", "❄️ Winter"], horizontal=True)
 default_appliances = summer_appliances if season.startswith("🌞") else winter_appliances
@@ -74,6 +58,7 @@ methanol_available = st.sidebar.selectbox("Methanol Tank Setup", [("1 × M10 (10
 selected_tank_liters = methanol_available[1]
 peak_power = st.sidebar.slider("⚡ Peak Load (W)", 0, 3000, 997)
 
+# Calculations
 daily_demand_wh = calculate_daily_energy_demand(custom_appliances)
 methanol_per_day = calculate_methanol_consumption(daily_demand_wh)
 autonomy_days = calculate_tank_autonomy(selected_tank_liters, methanol_per_day)
@@ -81,6 +66,7 @@ battery_autonomy_hours = battery_discharge_time(daily_demand_wh)
 efficiency_pct = min(system_efficiency(daily_demand_wh / 1000, methanol_per_day), 1.0)
 peak_coverage_pct = peak_load_coverage(peak_power)
 
+# KPI Display
 st.markdown("### 📊 Key Performance Indicators")
 k1, k2, k3 = st.columns(3)
 k1.metric("🔋 Daily Energy Demand", f"{daily_demand_wh:.0f} Wh")
@@ -91,43 +77,61 @@ k4.metric("⚡ Battery-Only Runtime", f"{battery_autonomy_hours:.1f} h")
 k5.metric("🌱 System Efficiency", f"{efficiency_pct*100:.1f}%")
 k6.metric("🚀 Peak Load Coverage", f"{peak_coverage_pct:.1f}%")
 
+# --- Graficos ---
+fig1, ax1 = plt.subplots(figsize=(4, 3))
 battery_energy = min(BATTERY_CAPACITY_WH, daily_demand_wh)
 fuel_cell_energy = max(0, daily_demand_wh - BATTERY_CAPACITY_WH)
-
-# --- Gráfico 1: Battery vs Fuel Cell ---
-fig1, ax1 = plt.subplots(figsize=(5, 4))
 ax1.bar("Daily Energy", battery_energy, label="Battery", color="#2196F3")
 ax1.bar("Daily Energy", fuel_cell_energy, bottom=battery_energy, label="Fuel Cell", color="#4CAF50")
 ax1.set_ylabel("Energy (Wh)")
-ax1.set_title("Battery vs Fuel Cell Contribution")
-ax1.legend()
+ax1.set_title("Battery vs Fuel Cell Contribution", fontsize=9)
+ax1.legend(fontsize=7)
 
-# --- Gráfico 2: Eficiencia y Cobertura ---
-fig2, ax2 = plt.subplots(figsize=(5, 4))
-metrics = ['System Efficiency (%)', 'Peak Load Coverage (%)']
-values = [efficiency_pct * 100, peak_coverage_pct]
-bars = ax2.bar(metrics, values, color=['#4CAF50', '#2196F3'])
-ax2.set_ylim(0, 110)
-ax2.set_title("Efficiency and Peak Load Coverage")
-for bar in bars:
-    height = bar.get_height()
-    ax2.annotate(f'{height:.1f}%',
-                 xy=(bar.get_x() + bar.get_width() / 2, height),
-                 xytext=(0, 3), textcoords="offset points",
-                 ha='center', va='bottom')
+# Gauge tipo velocímetro
+fig2, ax2 = plt.subplots(figsize=(4, 3), subplot_kw={'projection': 'polar'})
+value = efficiency_pct * 100
+max_val = 100
+min_val = 0
+start_angle = -105 * np.pi / 180
+end_angle = 105 * np.pi / 180
 
-# Mostrar los dos gráficos en la app en columnas horizontales
-col1, col2 = st.columns(2)
-with col1:
-    st.pyplot(fig1)
-with col2:
-    st.pyplot(fig2)
+# Zona de color
+angles = np.linspace(start_angle, end_angle, 100)
+values = np.linspace(min_val, max_val, 100)
+for i in range(len(angles) - 1):
+    ax2.barh(1, width=angles[i+1] - angles[i], left=angles[i], height=0.3,
+             color=plt.cm.viridis(values[i]/max_val), edgecolor='white')
 
+# Aguja
+theta = (value / 100) * (end_angle - start_angle) + start_angle
+ax2.arrow(theta, 0, 0, 0.6, width=0.015, head_width=0.04, head_length=0.2, fc='red', ec='red')
+
+# Texto
+ax2.text(0, -0.1, f"{value:.1f}%", ha='center', va='center', fontsize=8, fontweight='bold')
+
+# Etiquetas
+for val in range(0, 101, 25):
+    angle = (val / 100) * (end_angle - start_angle) + start_angle
+    ax2.text(angle, 0.75, f"{val}%", ha='center', va='center', fontsize=6)
+
+ax2.set_yticklabels([])
+ax2.set_xticklabels([])
+ax2.set_ylim(0, 1.2)
+ax2.set_title("System Efficiency Gauge", fontsize=9)
+ax2.spines['polar'].set_visible(False)
+
+# Mostrar ambos graficos en horizontal
+g_col1, g_col2 = st.columns(2)
+g_col1.pyplot(fig1)
+g_col2.pyplot(fig2)
+
+# --- Tabla de dispositivos ---
 st.markdown("### 🧾 Appliance Energy Summary")
 summary_df = pd.DataFrame(custom_appliances)
 summary_df["Energy (Wh)"] = summary_df["power"] * summary_df["hours"]
 st.dataframe(summary_df.style.format({"power": "{:.0f} W", "hours": "{:.2f} h", "Energy (Wh)": "{:.0f}"}))
 
+# --- Constantes ---
 st.markdown("### ⚙️ System Constants")
 constants = {
     "Battery Capacity": f"{BATTERY_CAPACITY_WH:.0f} Wh",
@@ -137,121 +141,47 @@ constants = {
 }
 st.table(constants)
 
-#---Formulas Referene---
-
-st.markdown("## 📘 KPI Formula Reference")
-
-with st.expander("Click to view all KPI calculation formulas"):
-    st.markdown(r"""  
-    <h6>🔋 Daily Energy Demand</h6>  
-    \[  
-    E_{daily} = \sum_{i=1}^{n} (P_i \times t_i)  
-    \]  
-    Where:  
-    - \( P_i \): Power of appliance *i* in watts  
-    - \( t_i \): Daily usage time of appliance *i* in hours  
-    
-    <h6>🧪 Methanol Consumption per Day</h6>  
-    \[  
-    V_{MeOH/day} = \frac{E_{daily}}{1000} \times 0.9  
-    \]  
-    
-    <h6>🛢️ Tank Autonomy</h6>  
-    \[  
-    A_{tank} = \frac{V_{tank}}{V_{MeOH/day}}  
-    \]  
-    
-    <h6>⚡ Battery-Only Runtime</h6>  
-    \[  
-    t_{battery} = \frac{C_{battery}}{E_{daily}}  
-    \]  
-    
-    <h6>🌱 System Efficiency</h6>  
-    \[  
-    \eta = \frac{E_{useful}}{E_{chemical}}  
-    \]  
-    
-    <h6>🚀 Peak Load Coverage</h6>  
-    \[  
-    \%Coverage =  
-    \begin{cases}  
-    100\%, & \text{if } I_{peak} \leq 200A \\  
-    \frac{200 \times 12.8}{P_{peak}} \times 100, & \text{otherwise}  
-    \end{cases}  
-    \]  
-    """, unsafe_allow_html=True)
-
-#---PDF Generator code---
+# --- PDF Report ---
 if st.button("📤 Generate PDF Report"):
-    # Guardar gráficos en archivos temporales
-    temp_dir = tempfile.gettempdir()
-    chart1_path = os.path.join(temp_dir, "chart1.png")
-    chart2_path = os.path.join(temp_dir, "chart2.png")
-    fig1.savefig(chart1_path, bbox_inches='tight')
-    fig2.savefig(chart2_path, bbox_inches='tight')
-
+    fig1.savefig("chart1.png")
+    fig2.savefig("chart2.png")
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_auto_page_break(auto=False)
+    pdf.set_font("Arial", size=8)
 
-    # Insert title and logo side by side in header
-    pdf.set_font("Arial", 'B', 14)
-    pdf.cell(0, 10, "", ln=True)  # spacing
-
-    # Save current position
-    pdf.set_xy(10, 10)
-    pdf.cell(120, 10, txt=clean_text("🔋 EFOY Hybrid Power System Report"), ln=0)
-
-    # Logo image on the right
-    logo_width = 40
-    logo_height = 40
-    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png",
-              x=pdf.w - logo_width - 10, y=10, w=logo_width, h=logo_height)
-
-    pdf.ln(20)  # move cursor below header
-
-    pdf.set_font("Arial", size=9)
-    pdf.cell(0, 6, txt=clean_text(f"Season: {season}"), ln=True)
-
-    pdf.cell(0, 6, txt="Key Performance Indicators:", ln=True)
-    kpi_data = [
-        f"Daily Energy Demand: {daily_demand_wh:.0f} Wh",
-        f"Methanol Needed/Day: {methanol_per_day:.2f} L",
-        f"Tank Autonomy: {autonomy_days:.1f} days",
-        f"Battery-Only Runtime: {battery_autonomy_hours:.1f} h",
-        f"System Efficiency: {efficiency_pct*100:.1f}%",
-        f"Peak Load Coverage: {peak_coverage_pct:.1f}%"
-    ]
-    for item in kpi_data:
-        pdf.cell(0, 5, txt=item, ln=True)
+    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", x=165, y=8, w=30)
+    pdf.ln(15)
+    pdf.set_font("Arial", 'B', 12)
+    pdf.cell(0, 8, clean_text("EFOY Hybrid Power System Report"), ln=True)
+    pdf.set_font("Arial", size=8)
+    pdf.cell(0, 5, clean_text(f"Season: {season}"), ln=True)
+    pdf.cell(0, 5, f"Daily Energy Demand: {daily_demand_wh:.0f} Wh", ln=True)
+    pdf.cell(0, 5, f"Methanol Needed/Day: {methanol_per_day:.2f} L", ln=True)
+    pdf.cell(0, 5, f"Tank Autonomy: {autonomy_days:.1f} days", ln=True)
+    pdf.cell(0, 5, f"Battery Runtime: {battery_autonomy_hours:.1f} h", ln=True)
+    pdf.cell(0, 5, f"Efficiency: {efficiency_pct*100:.1f}%", ln=True)
+    pdf.cell(0, 5, f"Peak Coverage: {peak_coverage_pct:.1f}%", ln=True)
 
     pdf.ln(3)
-    pdf.cell(0, 6, txt="Appliance Summary (W × h = Wh):", ln=True)
+    pdf.set_font("Arial", 'B', 9)
+    pdf.cell(0, 6, "Appliance Summary:", ln=True)
+    pdf.set_font("Arial", size=8)
     for row in summary_df.itertuples(index=False):
-        line = f"- {row.name}: {row.power} × {row.hours:.1f} = {row._3:.0f}"
-        pdf.cell(0, 5, txt=clean_text(line), ln=True)
+        pdf.cell(0, 5, clean_text(f"- {row.name}: {row.power} × {row.hours:.1f} = {row._3:.0f} Wh"), ln=True)
 
     pdf.ln(3)
-    pdf.cell(0, 6, txt="System Constants:", ln=True)
+    pdf.set_font("Arial", 'B', 9)
+    pdf.cell(0, 6, "System Constants:", ln=True)
+    pdf.set_font("Arial", size=8)
     for k, v in constants.items():
-        pdf.cell(0, 5, txt=f"- {k}: {v}", ln=True)
-
-    pdf.ln(3)
-    # Insertar gráficos uno debajo del otro
-    pdf.image(chart1_path, x=10, y=pdf.get_y(), w=pdf.w - 20)
-    pdf.ln(85)  # dejar espacio para la imagen anterior
-    pdf.image(chart2_path, x=10, y=pdf.get_y(), w=pdf.w - 20)
+        pdf.cell(0, 5, f"- {k}: {v}", ln=True)
 
     pdf.ln(2)
-    pdf.set_font("Arial", "I", 8)
-    pdf.multi_cell(0, 5, clean_text("Report generated for educational purposes - Task 2: Camping Truck. Servus! Enjoy your spring weekend in the Alps 🏕️"))
-
+    pdf.image("chart1.png", x=10, y=pdf.get_y(), w=90)
+    pdf.image("chart2.png", x=110, y=pdf.get_y(), w=90)
     pdf_output = BytesIO()
-    pdf_output.write(pdf.output(dest='S').encode('latin1'))
+    pdf.output(pdf_output)
     st.download_button("📩 Download PDF", data=pdf_output.getvalue(), file_name="efoy_kpi_report.pdf", mime="application/pdf")
 
-    # Limpiar archivos temporales
-    if os.path.exists(chart1_path):
-        os.remove(chart1_path)
-    if os.path.exists(chart2_path):
-        os.remove(chart2_path)
+    os.remove("chart1.png")
+    os.remove("chart2.png")
