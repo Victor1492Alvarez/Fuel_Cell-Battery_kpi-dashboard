@@ -113,7 +113,7 @@ with col2:
             }
         }
     ))
-    fig_gauge.update_layout(height=370, margin=dict(t=0, b=0, l=0, r=0))
+    fig_gauge.update_layout(height=380, margin=dict(t=0, b=0, l=0, r=0))
     st.plotly_chart(fig_gauge, use_container_width=True)
 
     with st.expander("📘 How to interpret the Global Efficiency Gauge"):
