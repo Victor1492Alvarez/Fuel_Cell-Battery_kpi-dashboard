@@ -4,3 +4,4 @@ fpdf
 pandas
 Pillow
 plotly
+kaleido
