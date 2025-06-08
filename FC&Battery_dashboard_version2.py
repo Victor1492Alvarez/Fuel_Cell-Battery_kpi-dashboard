@@ -114,6 +114,74 @@ constants = {
 }
 st.table(constants)
 
+# --- KPI Formula Reference Section ---
+st.markdown("## 📘 KPI Formula Reference")
+
+with st.expander("Click to view all KPI calculation formulas"):
+    st.markdown(r"""
+### 🔋 Daily Energy Demand
+\[
+E_{daily} = \sum_{i=1}^{n} (P_i \times t_i)
+\]
+Where:  
+- \( P_i \): Power of each device (in watts)  
+- \( t_i \): Daily usage time of each device (in hours)
+
+---
+
+### 🧪 Methanol Needed per Day
+\[
+M = \frac{E_{daily}}{1000} \times 0.9
+\]
+Where:  
+- \( E_{daily} \): Total daily energy demand (Wh)  
+- \( 0.9 \): Liters of methanol per kWh (EFOY Pro 2800 spec)
+
+---
+
+### 🛢️ Tank Autonomy
+\[
+A = \frac{V_{tank}}{M}
+\]
+Where:  
+- \( V_{tank} \): Total methanol volume available (liters)  
+- \( M \): Daily methanol consumption (liters)
+
+---
+
+### ⚡ Battery-Only Runtime
+\[
+R = \frac{C_{battery}}{E_{daily}}
+\]
+Where:  
+- \( C_{battery} \): Battery capacity (Wh)  
+- \( E_{daily} \): Daily energy demand (Wh)
+
+---
+
+### 🌱 System Efficiency
+\[
+\eta = \frac{E_{useful}}{E_{chemical}} = \frac{E_{daily}/1000}{L_{methanol} \times 1.1}
+\]
+Where:  
+- \( E_{useful} \): Useful energy delivered to the load (kWh)  
+- \( L_{methanol} \): Liters of methanol used  
+- \( 1.1 \): Approximate energy content per liter of methanol (kWh)
+
+---
+
+### 🚀 Peak Load Coverage
+\[
+Coverage = \min \left(100, \frac{P_{max}}{P_{peak}} \times 100 \right)
+\]
+Where:  
+- \( P_{max} = 200 \times 12.8 = 2560 \, W \): Maximum discharge power of battery (at 200A limit)  
+- \( P_{peak} \): User's peak power demand (W)
+
+---
+""")
+
+
 if st.button("📤 Generate PDF Report"):
     fig.savefig("temp_chart.png")
 
