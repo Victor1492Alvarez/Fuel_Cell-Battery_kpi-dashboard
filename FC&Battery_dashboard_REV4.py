@@ -115,7 +115,7 @@ with col2:
     🔍 Gauge interpretation:
     - <20% (🔴): Potential inefficient methanol use or overestimated load.
     - 20–50% (🟡): Normal functional range.
-    - >50% (🟢): Possibly battery-only energy or optimistic assumptions.
+    - >50% (🟢): Possibly battery-only supply.
     """)
 
 st.markdown("### 🧾 Appliance Energy Summary")
