@@ -161,7 +161,7 @@ if st.button("📤 Generate PDF Report"):
     try:
         logo_width = 40
         logo_height = 40
-        pdf.image("dashboard_logo.png", x=170, y=8, w=30,w=logo_width, h=logo_height)
+        pdf.image("dashboard_logo.png", x=170, y=8,w=logo_width, h=logo_height)
     except:
         pass
 
