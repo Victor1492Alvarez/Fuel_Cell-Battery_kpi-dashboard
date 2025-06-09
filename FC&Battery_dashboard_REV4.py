@@ -191,7 +191,7 @@ with st.expander("📘 What are the KPI Formulas about?"):
 
 if st.button("📤 Generate PDF Report"):
     fig.savefig("temp_chart.png", dpi=300, bbox_inches="tight")
-    fig_gauge.write_image("temp_gauge.png", scale=3)
+    fig_gauge.write_image("temp_gauge.png", scale=4)
 
     pdf = FPDF()
     pdf.add_page()
