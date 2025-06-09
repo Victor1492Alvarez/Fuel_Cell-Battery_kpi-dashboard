@@ -150,7 +150,7 @@ with col2:
     ))
 
     fig_gauge.update_layout(
-        height=320,
+        height=325,
         margin=dict(t=50, b=30, l=0, r=0)
     )
 
