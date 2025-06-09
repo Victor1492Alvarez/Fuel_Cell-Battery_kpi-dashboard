@@ -131,7 +131,7 @@ with col2:
         value=global_efficiency * 100,
         title={
             'text': "Global Efficiency (%)",
-            'font': {'size': 20}
+            'font': {'size': 20,'color': "black"}
         },
         gauge={
             'axis': {'range': [0, 100], 'tickwidth': 1},
