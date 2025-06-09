@@ -107,7 +107,7 @@ with col1:
     for bar in bars_fc:
         height = bar.get_height()
         bottom = bar.get_y()
-        ax.text(bar.get_x() + bar.get_width()/2, bottom + height / 2, f"{height:.0f} Wh",
+        ax.text(bar.get_x() + bar.get_width()/2, bottom + height / 2, f"{height:1.0f} Wh",
                 ha='center', va='center', color='white', fontweight='bold')
 
     ax.set_ylabel("Energy (Wh)")
