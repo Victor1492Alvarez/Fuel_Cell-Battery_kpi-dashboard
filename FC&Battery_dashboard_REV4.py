@@ -92,14 +92,38 @@ k6.metric("🚀 Peak Load Coverage", f"{peak_coverage_pct:.1f}%")
 
 col1, col2 = st.columns(2)
 
+col1, col2 = st.columns(2)
+
 with col1:
     fig, ax = plt.subplots(figsize=(5.5, 4.2))
-    ax.bar("Daily Energy", battery_energy, label="Battery", color="#2196F3")
-    ax.bar("Daily Energy", fuel_cell_energy, bottom=battery_energy, label="Fuel Cell", color="#4CAF50")
+    bars_battery = ax.bar("Daily Energy", battery_energy, label="Battery", color="#2196F3")
+    bars_fc = ax.bar("Daily Energy", fuel_cell_energy, bottom=battery_energy, label="Fuel Cell", color="#4CAF50")
+    
+    # Etiquetas en texto blanco y negrita
+    for bar in bars_battery:
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2, height / 2, f"{height:.0f} Wh",
+                ha='center', va='center', color='white', fontweight='bold')
+    for bar in bars_fc:
+        height = bar.get_height()
+        bottom = bar.get_y()
+        ax.text(bar.get_x() + bar.get_width()/2, bottom + height / 2, f"{height:.0f} Wh",
+                ha='center', va='center', color='white', fontweight='bold')
+
     ax.set_ylabel("Energy (Wh)")
     ax.set_title("Battery vs Fuel Cell Contribution")
     ax.legend()
     st.pyplot(fig)
+
+    with st.expander("📘 How to interpret the Energy Contribution Chart"):
+        st.markdown("""
+        This bar chart shows how your daily energy demand is covered:
+        - **Blue section**: Energy supplied by the **Battery** (max 1344 Wh)
+        - **Green section**: Remaining demand covered by the **Fuel Cell**
+        
+        If only the blue bar is visible, your battery is sufficient for the daily load.
+        If both bars appear, the fuel cell steps in to meet the remaining need.
+        """)
 
 with col2:
     fig_gauge = go.Figure(go.Indicator(
