@@ -151,7 +151,7 @@ with col2:
 
     fig_gauge.update_layout(
         height=340,
-        margin=dict(t=60, b=20, l=0, r=0)
+        margin=dict(t=50, b=20, l=0, r=0)
     )
 
     st.plotly_chart(fig_gauge, use_container_width=True)
