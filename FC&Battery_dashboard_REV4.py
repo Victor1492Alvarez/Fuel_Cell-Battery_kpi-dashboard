@@ -249,7 +249,7 @@ if st.button("📤 Generate PDF Report"):
     # Gráficos
     pdf.ln(3)
     pdf.image("temp_chart.png", x=10, y=170, w=90,h=80)
-    pdf.image("temp_gauge.png", x=90, y=190, w=120, h=70)
+    pdf.image("temp_gauge.png", x=100, y=190, w=130, h=70)
 
     # Gauge interpretation
     pdf.set_xy(10, 250)
