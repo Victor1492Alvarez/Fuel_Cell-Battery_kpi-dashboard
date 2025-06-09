@@ -95,7 +95,7 @@ col1, col2 = st.columns(2)
 col1, col2 = st.columns(2)
 
 with col1:
-    fig, ax = plt.subplots(figsize=(5.5, 4.2))
+    fig, ax = plt.subplots(figsize=(4.2, 4.2))
     bars_battery = ax.bar("Daily Energy", battery_energy, label="Battery", color="#2196F3")
     bars_fc = ax.bar("Daily Energy", fuel_cell_energy, bottom=battery_energy, label="Fuel Cell", color="#4CAF50")
     
