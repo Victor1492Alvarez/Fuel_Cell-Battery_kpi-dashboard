@@ -7,7 +7,7 @@ from fpdf import FPDF
 import os
 import plotly.graph_objects as go
 
-st.set_page_config(page_title="Hybrid System KPI Dashboard", layout="wide")
+st.set_page_config(page_title="Camping System KPI Dashboard", layout="wide")
 
 st.markdown("""
     <div style="display: flex; align-items: center; gap: 10px;">
@@ -156,12 +156,12 @@ st.table(constants)
 with st.expander("📘 What are the KPI Formulas about?"):
     st.markdown("""
     <small>
-    - **Daily Energy Demand** = Σ(Power × Hours) of all devices<br>
-    - **Methanol Needed/Day** = Energy (kWh) × 0.9 L/kWh<br>
-    - **Tank Autonomy** = Available Methanol / Daily Consumption<br>
-    - **Battery-Only Runtime** = Battery Capacity / Daily Energy<br>
-    - **Global System Efficiency** = Useful FC Energy / (Methanol × 1.1 kWh/L)<br>
-    - **Peak Load Coverage** = % peak load battery can support (max 1280 W)<br>
+    - Daily Energy Demand = Σ(Power × Hours) of all devices<br>
+    - Methanol Needed/Day = Energy (kWh) × 0.9 L/kWh<br>
+    - Tank Autonomy = Available Methanol / Daily Consumption<br>
+    - Battery-Only Runtime = Battery Capacity / Daily Energy<br>
+    - Global System Efficiency = Useful FC Energy / (Methanol × 1.1 kWh/L)<br>
+    - Peak Load Coverage = % peak load battery can support (max 1280 W)<br>
     </small>
     """, unsafe_allow_html=True)
 
