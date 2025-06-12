@@ -166,7 +166,7 @@ colg1.plotly_chart(fig_batt, use_container_width=True)
 colg2.plotly_chart(fig_eff, use_container_width=True)
 
 with st.expander("📊 How to interpret the gauges"):
-    st.markdown("The "Battery Autonomy" gauge estimates how long your system can run solely on battery power before requiring recharging. The "System Efficiency" gauge reflects how effectively methanol fuel is converted into usable electrical energy across the system.")
+    st.markdown("The **Battery Autonomy** gauge estimates how long your system can run solely on battery power before requiring recharging. The **System Efficiency** gauge reflects how effectively methanol fuel is converted into usable electrical energy across the system.")
 
 # Save gauge images for PDF
 fig_batt.write_image("/tmp/battery_gauge.png")
