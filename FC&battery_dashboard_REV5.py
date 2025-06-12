@@ -17,13 +17,13 @@ col1, col2 = st.columns([4, 1])
 with col1:
     st.subheader("System Performance Analyzer")
 with col2:
-    st.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", width=100)
+    st.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", width=140)
 
 # Sidebar - Scenario Selection
-scenario = st.sidebar.selectbox("Select Load Scenario", ["Base", "Moderate", "Peak"])
+scenario = st.sidebar.selectbox("Select Load Scenario", ["Base 500 W", "Moderate 750 W", "Peak 1000 W"])
 
 # Define appliances by scenario
-if scenario == "Base":
+if scenario == "Base 500 W":
     appliances = [
         {"name": "Laptop (230 V)", "power": 95, "hours": 4},
         {"name": "Led Lighting (12 V)", "power": 15, "hours": 6},
@@ -32,7 +32,7 @@ if scenario == "Base":
         {"name": "Electric kettle (12 V)", "power": 300, "hours": 0.5},
         {"name": "Radio (12 V)", "power": 5, "hours": 3},
     ]
-elif scenario == "Moderate":
+elif scenario == "Moderate 750 W":
     appliances = [
         {"name": "Laptop (230 V)", "power": 15, "hours": 4},
         {"name": "Led Lighting (12 V)", "power": 95, "hours": 6},
@@ -54,7 +54,7 @@ else:
     ]
 
 custom_appliances = []
-st.sidebar.header("Adjust Usage Hours")
+st.sidebar.header("Adjust Operating Hours")
 for app in appliances:
     h = st.sidebar.slider(f"{app['name']} Hours", 0.0, 24.0, float(app['hours']), 0.5)
     custom_appliances.append({"name": app['name'], "power": app['power'], "hours": h})
@@ -88,7 +88,7 @@ with colg1:
         title={'text': "Battery Autonomy (h)"},
         gauge={
             'axis': {'range': [0, 24]},
-            'bar': {'color': "#4CAF50"},
+            'bar': {'color': "black"},
             'steps': [
                 {'range': [0, 2.4], 'color': "gray"},
                 {'range': [2.4, 7.2], 'color': "red"},
@@ -105,7 +105,7 @@ with colg2:
         title={'text': "System Efficiency (%)"},
         gauge={
             'axis': {'range': [0, 100]},
-            'bar': {'color': "#2196F3"},
+            'bar': {'color': "black"},
             'steps': [
                 {'range': [0, 20], 'color': "red"},
                 {'range': [20, 50], 'color': "orange"},
