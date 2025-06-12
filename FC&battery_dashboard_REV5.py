@@ -208,4 +208,4 @@ if st.button("Generate PDF Report"):
     pdf_output = BytesIO()
     pdf_bytes = pdf.output(dest='S').encode('latin1')
     st.download_button("📤 Download Report", data=pdf_bytes, file_name="efoy_kpi_report.pdf", mime="application/pdf")
-    st.download_button("📤 Download Report", data=pdf_output.getvalue(), file_name="efoy_kpi_report.pdf", mime="application/pdf")
+    
