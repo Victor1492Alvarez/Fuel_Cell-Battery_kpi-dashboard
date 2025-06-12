@@ -134,7 +134,7 @@ st.dataframe(df.rename(columns={"name": "Device", "power": "Power (W)", "hours":
 fig_batt = go.Figure(go.Indicator(
     mode="gauge+number",
     value=battery_hours,
-    title={'text': "Battery Autonomy (h)"},
+    title={'text': "Battery Autonomy (h)",'font': {'size': 20,'color': "black"}}
     gauge={
         'axis': {'range': [0, 24]},
         'bar': {'color': "black"},
@@ -149,7 +149,7 @@ fig_batt = go.Figure(go.Indicator(
 fig_eff = go.Figure(go.Indicator(
     mode="gauge+number",
     value=efficiency_pct * 100,
-    title={'text': "System Efficiency (%)"},
+    title={'text': "System Efficiency (%)",'font': {'size': 20,'color': "black"}}
     gauge={
         'axis': {'range': [0, 100]},
         'bar': {'color': "black"},
@@ -213,17 +213,17 @@ if st.button("Generate PDF Performance Report"):
     pdf.image("/tmp/battery_gauge.png", x=5, y=pdf.get_y(), w=105)
     pdf.image("/tmp/efficiency_gauge.png", x=100, y=pdf.get_y(), w=105)
 
-    pdf.ln(65)
+    pdf.ln(60)
     pdf.set_font("Arial", size=8)
     pdf.cell(200, 6, "The gauges show key metrics for system autonomy and energy conversion efficiency.", ln=True)
-    pdf.ln(10)
-    pdf.set_font("Arial", size=8)
-    pdf.cell(200, 4, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True)
-    pdf.cell(200, 4, "Coder: Victor Alvarez Melendez", ln=True)
-    pdf.cell(200, 4, "Master Student in Hydrogen Technology", ln=True)
-    pdf.cell(200, 4, "Technische Hochschule Rosenheim - Campus Burghausen", ln=True)
+    pdf.ln(8)
+    pdf.set_font("Arial", size=6)
+    pdf.cell(200, 2, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True)
+    pdf.cell(200, 2, "Coder: Victor Alvarez Melendez", ln=True)
+    pdf.cell(200, 2, "Master Student in Hydrogen Technology", ln=True)
+    pdf.cell(200, 2, "Technische Hochschule Rosenheim - Campus Burghausen", ln=True)
     pdf.ln(4)
-    pdf.cell(200, 4, "Thanks for using our App. Servus and enjoy your camping days in the Alps.", ln=True)
+    pdf.cell(200, 4, "Thanks for using our App. Servus and enjoy your camping days in the Alps!.", ln=True)
 
     pdf_bytes = pdf.output(dest='S').encode('latin1')
     st.download_button("📥 Download PDF Report", data=pdf_bytes, file_name="efoy_kpi_report.pdf", mime="application/pdf")
