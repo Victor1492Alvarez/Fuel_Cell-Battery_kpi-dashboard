@@ -11,7 +11,7 @@ from kpi_calculator_version2 import *
 import plotly.graph_objects as go
 
 st.set_page_config(page_title="Camping Truck System", layout="wide")
-st.title("🔋 Fuel Cell & Battery Hybrid KPI Dashboard")
+st.title("🔋 Camping Truck System Direct Methanol Fuel Cell & Battery Hybrid KPI Dashboard")
 
 col1, col2 = st.columns([4, 1])
 with col1:
@@ -54,7 +54,7 @@ else:
     ]
 
 custom_appliances = []
-st.sidebar.header("Adjust Usage Hours")
+st.sidebar.header("Adjust Operating Hours")
 for app in appliances:
     h = st.sidebar.slider(f"{app['name']} Hours", 0.0, 24.0, float(app['hours']), 0.5)
     custom_appliances.append({"name": app['name'], "power": app['power'], "hours": h})
