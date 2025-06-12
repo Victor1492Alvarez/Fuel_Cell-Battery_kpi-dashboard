@@ -20,7 +20,7 @@ with col2:
     st.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", width=130)
 
 # Sidebar - Scenario Selection
-scenario = st.sidebar.selectbox("Select Load Scenario", ["Base 500 W", "Moderate 750 W", "Peak 1000 ""])
+scenario = st.sidebar.selectbox("Select Load Scenario", ["Base 500 W", "Moderate 750 W", "Peak 1000 "])
 
 # Define appliances by scenario
 if scenario == "Base 500 W":
