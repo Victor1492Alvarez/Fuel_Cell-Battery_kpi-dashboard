@@ -17,10 +17,10 @@ col1, col2 = st.columns([4, 1])
 with col1:
     st.subheader("System Performance Analyzer")
 with col2:
-    st.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", width=140)
+    st.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", width=130)
 
 # Sidebar - Scenario Selection
-scenario = st.sidebar.selectbox("Select Load Scenario", ["Base 500 W", "Moderate 750 W", "Peak 1000 W"])
+scenario = st.sidebar.selectbox("Select Load Scenario", ["Base 500 W", "Moderate 750 W", "Peak 1000 ""])
 
 # Define appliances by scenario
 if scenario == "Base 500 W":
@@ -54,7 +54,7 @@ else:
     ]
 
 custom_appliances = []
-st.sidebar.header("Adjust Operating Hours")
+st.sidebar.header("Adjust Usage Hours")
 for app in appliances:
     h = st.sidebar.slider(f"{app['name']} Hours", 0.0, 24.0, float(app['hours']), 0.5)
     custom_appliances.append({"name": app['name'], "power": app['power'], "hours": h})
@@ -73,63 +73,79 @@ charge_time = battery_charge_time_needed(battery_deficit)
 k1, k2, k3 = st.columns(3)
 k1.metric("🔋 Daily Energy Demand", f"{daily_demand_wh:.0f} Wh")
 k2.metric("🧪 Methanol Needed/Day", f"{methanol_per_day:.2f} L")
-k3.metric("🛢️ Tank Autonomy", f"{autonomy_days:.1f} days")
+k3.metric("📂 Tank Autonomy", f"{autonomy_days:.1f} days")
 k4, k5, k6 = st.columns(3)
 k4.metric("🔋 Battery Autonomy", f"{battery_hours:.1f} h")
 k5.metric("🌱 System Efficiency", f"{efficiency_pct*100:.1f}%")
 k6.metric("⚡ Battery Charge Time", f"{charge_time:.1f} h")
 
+# Appliance Summary Table
+st.markdown("### 🔌 Appliance Energy Summary")
+df = pd.DataFrame(custom_appliances)
+df['Energy (Wh)'] = df['power'] * df['hours']
+df['Battery Capacity Used (Ah)'] = df['Energy (Wh)'] / BATTERY_VOLTAGE
+
+total_row = pd.DataFrame({
+    "name": ["**TOTAL**"],
+    "power": [df['power'].sum()],
+    "hours": ["-"],
+    "Energy (Wh)": [df['Energy (Wh)'].sum()],
+    "Battery Capacity Used (Ah)": [df['Battery Capacity Used (Ah)'].sum()]
+})
+df = pd.concat([df, total_row], ignore_index=True)
+
+st.dataframe(df.rename(columns={"name": "Device", "power": "Power (W)", "hours": "Hours"}))
+
 # Gauges
+fig_batt = go.Figure(go.Indicator(
+    mode="gauge+number",
+    value=battery_hours,
+    title={'text': "Battery Autonomy (h)"},
+    gauge={
+        'axis': {'range': [0, 24]},
+        'bar': {'color': "black"},
+        'steps': [
+            {'range': [0, 2.4], 'color': "gray"},
+            {'range': [2.4, 7.2], 'color': "red"},
+            {'range': [7.2, 12], 'color': "orange"},
+            {'range': [12, 19.2], 'color': "yellow"},
+            {'range': [19.2, 24], 'color': "green"},
+        ]
+    }))
+fig_eff = go.Figure(go.Indicator(
+    mode="gauge+number",
+    value=efficiency_pct * 100,
+    title={'text': "System Efficiency (%)"},
+    gauge={
+        'axis': {'range': [0, 100]},
+        'bar': {'color': "black"},
+        'steps': [
+            {'range': [0, 20], 'color': "red"},
+            {'range': [20, 50], 'color': "orange"},
+            {'range': [50, 80], 'color': "yellow"},
+            {'range': [80, 100], 'color': "green"},
+        ]
+    }))
+
 colg1, colg2 = st.columns(2)
-with colg1:
-    fig_batt = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=battery_hours,
-        title={'text': "Battery Autonomy (h)"},
-        gauge={
-            'axis': {'range': [0, 24]},
-            'bar': {'color': "black"},
-            'steps': [
-                {'range': [0, 2.4], 'color': "gray"},
-                {'range': [2.4, 7.2], 'color': "red"},
-                {'range': [7.2, 12], 'color': "orange"},
-                {'range': [12, 19.2], 'color': "yellow"},
-                {'range': [19.2, 24], 'color': "green"},
-            ]
-        }))
-    st.plotly_chart(fig_batt, use_container_width=True)
-with colg2:
-    fig_eff = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=efficiency_pct * 100,
-        title={'text': "System Efficiency (%)"},
-        gauge={
-            'axis': {'range': [0, 100]},
-            'bar': {'color': "black"},
-            'steps': [
-                {'range': [0, 20], 'color': "red"},
-                {'range': [20, 50], 'color': "orange"},
-                {'range': [50, 80], 'color': "yellow"},
-                {'range': [80, 100], 'color': "green"},
-            ]
-        }))
-    st.plotly_chart(fig_eff, use_container_width=True)
+colg1.plotly_chart(fig_batt, use_container_width=True)
+colg2.plotly_chart(fig_eff, use_container_width=True)
 
 with st.expander("ℹ️ How to interpret the gauges"):
     st.markdown("The **Battery Autonomy** gauge estimates how long your system can run solely on battery power before requiring recharging. The **System Efficiency** gauge reflects how effectively methanol fuel is converted into usable electrical energy across the system.")
 
-# Save gauges for PDF
+# Save gauge images for PDF
 fig_batt.write_image("/tmp/battery_gauge.png")
 fig_eff.write_image("/tmp/efficiency_gauge.png")
 
-# PDF Export Button
-st.markdown("### 📥 Export KPIs as PDF")
+# PDF Generation Section
+st.markdown("### 📅 Export KPIs as PDF")
 if st.button("Generate PDF Report"):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", "B", 14)
     pdf.cell(140, 10, "Fuel Cell and Battery System Performance Report", ln=0)
-    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", x=170, y=20, w=35)
+    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", x=170, y=10, w=30)
     pdf.ln(12)
     pdf.set_font("Arial", size=11)
     pdf.cell(200, 6, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True)
@@ -147,14 +163,10 @@ if st.button("Generate PDF Report"):
     pdf.cell(200, 6, f"System Efficiency: {efficiency_pct*100:.1f}%", ln=True)
     pdf.cell(200, 6, f"Battery Charge Time: {charge_time:.1f} h", ln=True)
     pdf.ln(4)
-    pdf.image("/tmp/battery_gauge.png", x=10, y=pdf.get_y(), w=100)
-    pdf.image("/tmp/efficiency_gauge.png", x=110, y=pdf.get_y(), w=100)
-    pdf.ln(55)
-    pdf.set_font("Arial", "I", 12)
+    pdf.image("/tmp/battery_gauge.png", x=10, y=pdf.get_y(), w=90)
+    pdf.image("/tmp/efficiency_gauge.png", x=110, y=pdf.get_y(), w=90)
+    pdf.ln(50)
+    pdf.set_font("Arial", "I", 11)
     pdf.cell(200, 6, "All values are estimated for academic and study purposes.", ln=True)
-
     pdf_bytes = pdf.output(dest='S').encode('latin1')
-st.download_button("📤 Download Report", data=pdf_bytes, file_name="efoy_kpi_report.pdf", mime="application/pdf")
-
-
-
+    st.download_button("📤 Download Report", data=pdf_bytes, file_name="efoy_kpi_report.pdf", mime="application/pdf")
