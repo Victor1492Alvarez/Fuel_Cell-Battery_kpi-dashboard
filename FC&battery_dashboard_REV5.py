@@ -1,6 +1,6 @@
 # FC&Battery_dashboard_REV5.py
 import streamlit as st
-from kpi_calculator import *
+from kpi_calculator_version2 import *
 import matplotlib.pyplot as plt
 import pandas as pd
 from io import BytesIO
