@@ -68,7 +68,7 @@ daily_demand_wh = calculate_daily_energy_demand(appliances)
 methanol_per_day = calculate_methanol_consumption(daily_demand_wh)
 autonomy_days = calculate_tank_autonomy(selected_tank_liters, methanol_per_day)
 battery_hours = battery_discharge_time(daily_demand_wh)
-charge_time = battery_charge_time_needed(BATTERY_CAPACITY_WH)
+charge_time = battery_charge_time_needed(0)
 efficiency_pct = system_efficiency(daily_demand_wh / 1000, methanol_per_day)
 
 # KPI display
