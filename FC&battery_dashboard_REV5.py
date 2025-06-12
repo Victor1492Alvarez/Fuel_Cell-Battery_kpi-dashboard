@@ -22,11 +22,11 @@ with col2:
 # 🔹 Help Section 1: App Introduction
 with st.expander("ℹ️ About This App"):
     st.markdown("""
-    This dashboard simulates the performance of a hybrid energy supply system using a **direct methanol fuel cell (DMFC)** and a **lithium battery**.
+    This dashboard simulates the performance of a hybrid energy supply system using a **direct methanol fuel cell EFOY Pro 2800 (DMFC)** and an EFOY Li 105 Lithium Battery from the company SFC Energy AG.
 
-    🔍 **Objective:** Estimate energy needs and analyze autonomy, fuel use, and system efficiency under three typical camping scenarios: Base, Moderate, and Peak Load.
+    🔍 Objective: Estimate energy needs and analyze autonomy, methanol consumption and system efficiency under three typical camping scenarios: Base, Moderate, and Peak Load.
 
-    🛠️ **Tip:** Use the sidebar to explore different usage patterns by adjusting the operating hours of each device.
+    🛠️ Tip: Use the sidebar at the left to explore different usage patterns by adjusting the operating hours of each device and tanks!.
     """)
 
 # Sidebar - Scenario Selection
@@ -165,8 +165,11 @@ colg1, colg2 = st.columns(2)
 colg1.plotly_chart(fig_batt, use_container_width=True)
 colg2.plotly_chart(fig_eff, use_container_width=True)
 
-with st.expander("📊 How to interpret the gauges"):
-    st.markdown("The **Battery Autonomy** gauge estimates how long your system can run solely on battery power before requiring recharging. The **System Efficiency** gauge reflects how effectively methanol fuel is converted into usable electrical energy across the system.")
+with st.expander("📊 How to interpret the chart gauges"):
+    st.markdown("""
+                The Battery Autonomy gauge estimates how long your system can run solely on battery power before requiring recharging. 
+                The System Efficiency gauge reflects how effectively methanol fuel is converted into usable electrical energy across the system.
+                """)
 
 # Save gauge images for PDF
 fig_batt.write_image("/tmp/battery_gauge.png")
@@ -174,12 +177,12 @@ fig_eff.write_image("/tmp/efficiency_gauge.png")
 
 # PDF Report
 st.markdown("### 📄 Export Full Report as PDF")
-if st.button("Generate PDF Report"):
+if st.button("Generate PDF Performance Report"):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", "B", 12)
     pdf.cell(10, 10, "Fuel Cell & Battery Performance System Report", ln=0)
-    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", x=170, y=10, w=25)
+    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", x=170, y=10, w=35)
     pdf.ln(14)
 
     pdf.set_font("Arial", "B", 11)
@@ -211,9 +214,9 @@ if st.button("Generate PDF Report"):
     pdf.image("/tmp/efficiency_gauge.png", x=110, y=pdf.get_y(), w=90)
 
     pdf.ln(55)
-    pdf.set_font("Arial", size=10)
+    pdf.set_font("Arial", size=8)
     pdf.cell(200, 6, "The gauges show key metrics for system autonomy and energy conversion efficiency.", ln=True)
-    pdf.ln(4)
+    pdf.ln(1)
     pdf.set_font("Arial", size=8)
     pdf.cell(200, 6, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True)
     pdf.cell(200, 6, "Coder: Victor Alvarez Melendez", ln=True)
