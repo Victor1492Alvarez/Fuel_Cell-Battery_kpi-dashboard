@@ -153,7 +153,7 @@ if st.button("Generate PDF Report"):
     pdf.set_font("Arial", "I", 10)
     pdf.cell(200, 6, "All values are estimated for academic and study purposes.", ln=True)
 
-  pdf_bytes = pdf.output(dest='S').encode('latin1')
+    pdf_bytes = pdf.output(dest='S').encode('latin1')
 st.download_button("📤 Download Report", data=pdf_bytes, file_name="efoy_kpi_report.pdf", mime="application/pdf")
 
 
