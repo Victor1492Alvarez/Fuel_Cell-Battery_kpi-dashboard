@@ -157,3 +157,4 @@ if st.button("Generate PDF Report"):
 st.download_button("📤 Download Report", data=pdf_bytes, file_name="efoy_kpi_report.pdf", mime="application/pdf")
 
 
+
