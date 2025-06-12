@@ -37,22 +37,31 @@ scenario = st.sidebar.selectbox("Select Use Scenario", ["Base", "Moderate", "Pea
 
 if scenario == "Base":
     appliances = [
-        {"name": "Fridge", "power": 45, "hours": 24},
-        {"name": "Lights", "power": 10, "hours": 4},
-        {"name": "Laptop", "power": 60, "hours": 2},
-        {"name": "Heater Fan", "power": 250, "hours": 1},
-        {"name": "Water Pump", "power": 50, "hours": 0.5},
+        {"name": "Fridge", "power": 45, "hours": st.sidebar.slider("Fridge (Base)", 0.0, 24.0, 24.0, 0.5)},
+        {"name": "Lights", "power": 10, "hours": st.sidebar.slider("Lights (Base)", 0.0, 24.0, 4.0, 0.5)},
+        {"name": "Laptop", "power": 60, "hours": st.sidebar.slider("Laptop (Base)", 0.0, 24.0, 2.0, 0.5)},
+        {"name": "Heater Fan", "power": 250, "hours": st.sidebar.slider("Heater Fan (Base)", 0.0, 24.0, 1.0, 0.5)},
+        {"name": "Water Pump", "power": 50, "hours": st.sidebar.slider("Water Pump (Base)", 0.0, 24.0, 0.5, 0.5)}
     ]
 elif scenario == "Moderate":
     appliances = [
-        {"name": "Fridge", "power": 45, "hours": 24},
-        {"name": "Lights", "power": 10, "hours": 6},
-        {"name": "Laptop", "power": 60, "hours": 4},
-        {"name": "Heater Fan", "power": 250, "hours": 2},
-        {"name": "Water Pump", "power": 50, "hours": 0.5},
-        {"name": "TV", "power": 80, "hours": 2},
+        {"name": "Fridge", "power": 45, "hours": st.sidebar.slider("Fridge (Moderate)", 0.0, 24.0, 24.0, 0.5)},
+        {"name": "Lights", "power": 10, "hours": st.sidebar.slider("Lights (Moderate)", 0.0, 24.0, 6.0, 0.5)},
+        {"name": "Laptop", "power": 60, "hours": st.sidebar.slider("Laptop (Moderate)", 0.0, 24.0, 4.0, 0.5)},
+        {"name": "Heater Fan", "power": 250, "hours": st.sidebar.slider("Heater Fan (Moderate)", 0.0, 24.0, 2.0, 0.5)},
+        {"name": "Water Pump", "power": 50, "hours": st.sidebar.slider("Water Pump (Moderate)", 0.0, 24.0, 0.5, 0.5)},
+        {"name": "TV", "power": 80, "hours": st.sidebar.slider("TV (Moderate)", 0.0, 24.0, 2.0, 0.5)}
     ]
 else:
+    appliances = [
+        {"name": "Fridge", "power": 45, "hours": st.sidebar.slider("Fridge (Peak)", 0.0, 24.0, 24.0, 0.5)},
+        {"name": "Lights", "power": 10, "hours": st.sidebar.slider("Lights (Peak)", 0.0, 24.0, 10.0, 0.5)},
+        {"name": "Laptop", "power": 60, "hours": st.sidebar.slider("Laptop (Peak)", 0.0, 24.0, 6.0, 0.5)},
+        {"name": "Heater Fan", "power": 250, "hours": st.sidebar.slider("Heater Fan (Peak)", 0.0, 24.0, 3.0, 0.5)},
+        {"name": "Water Pump", "power": 50, "hours": st.sidebar.slider("Water Pump (Peak)", 0.0, 24.0, 1.0, 0.5)},
+        {"name": "TV", "power": 80, "hours": st.sidebar.slider("TV (Peak)", 0.0, 24.0, 3.0, 0.5)},
+        {"name": "Electric Blanket", "power": 100, "hours": st.sidebar.slider("Electric Blanket (Peak)", 0.0, 24.0, 4.0, 0.5)}
+    ]
     appliances = [
         {"name": "Fridge", "power": 45, "hours": 24},
         {"name": "Lights", "power": 10, "hours": 10},
@@ -190,6 +199,15 @@ if st.button("Generate PDF Report"):
     pdf.cell(200, 10, txt=f"Battery Remaining Autonomy: {battery_hours:.1f} h", ln=True)
     pdf.cell(200, 10, txt=f"Battery Charge Time (DMFC): {charge_time:.1f} h", ln=True)
     pdf.cell(200, 10, txt=f"Global System Efficiency: {efficiency_pct*100:.1f}%", ln=True)
+
+    # Insert gauge image placeholder
+    pdf.ln(10)
+    pdf.set_font("Arial", 'B', 11)
+    pdf.cell(95, 10, txt="Battery Autonomy Gauge", ln=0)
+    pdf.cell(95, 10, txt="System Efficiency Gauge", ln=1)
+    pdf.image("/tmp/battery_gauge.png", x=10, y=pdf.get_y(), w=90)
+    pdf.image("/tmp/efficiency_gauge.png", x=110, y=pdf.get_y(), w=90)
+    pdf.ln(60)
     pdf.ln(5)
     pdf.set_font("Arial", size=10)
     pdf.multi_cell(0, 10, txt="Battery gauge represents remaining hours of autonomy based on current usage. Efficiency gauge reflects how effectively the methanol is converted to usable energy. Ranges are color coded for quick interpretation.")
