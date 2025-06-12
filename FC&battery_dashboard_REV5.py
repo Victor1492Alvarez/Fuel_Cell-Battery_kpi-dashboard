@@ -223,9 +223,6 @@ if st.button("Generate PDF Performance Report"):
     pdf.cell(200, 3, "Coder: Victor Alvarez Melendez", ln=True)
     pdf.cell(200, 3, "Master Student in Hydrogen Technology", ln=True)
     pdf.cell(200, 3, "Technische Hochschule Rosenheim - Campus Burghausen", ln=True)
-   
-    pdf.ln(1)
-    pdf.set_y(-20)
     pdf.cell(200, 4, "Thanks for using our App. Servus and enjoy your camping days in the Alps!.", ln=True)
 
     pdf_bytes = pdf.output(dest='S').encode('latin1')
