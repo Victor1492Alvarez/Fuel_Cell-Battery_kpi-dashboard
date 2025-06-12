@@ -218,9 +218,9 @@ if st.button("Generate PDF Performance Report"):
     pdf.set_font("Arial", size=8)
     pdf.cell(200, 6, "The gauges show key metrics for system autonomy and energy conversion efficiency.", ln=True)
     
-    pdf.ln(14)
-    pdf.set_font("Arial", size=8)
-    pdf.cell(200, 3, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True)
+    pdf.ln(16)
+    pdf.set_font("Arial","B", size=8)
+    pdf.cell(200, 3, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}. Values strictly estimated for academic purposes", ln=True)
     pdf.cell(200, 3, "Coder: Victor Alvarez Melendez", ln=True)
     pdf.cell(200, 3, "Master Student in Hydrogen Technology", ln=True)
     pdf.cell(200, 3, "Technische Hochschule Rosenheim - Campus Burghausen", ln=True)
