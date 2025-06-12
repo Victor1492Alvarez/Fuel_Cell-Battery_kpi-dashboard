@@ -134,7 +134,7 @@ st.dataframe(df.rename(columns={"name": "Device", "power": "Power (W)", "hours":
 fig_batt = go.Figure(go.Indicator(
     mode="gauge+number",
     value=battery_hours,
-    title={'text': "Battery Autonomy (h)",'font': {'size': 20,'color': "black"}},
+    title={'text': "Battery Autonomy (h)",'font': {'size': 22,'color': "black"}},
     gauge={
         'axis': {'range': [0, 24]},
         'bar': {'color': "black"},
@@ -149,7 +149,7 @@ fig_batt = go.Figure(go.Indicator(
 fig_eff = go.Figure(go.Indicator(
     mode="gauge+number",
     value=efficiency_pct * 100,
-    title={'text': "System Efficiency (%)",'font': {'size': 20,'color': "black"}},
+    title={'text': "System Efficiency (%)",'font': {'size': 22,'color': "black"}},
     gauge={
         'axis': {'range': [0, 100]},
         'bar': {'color': "black"},
@@ -217,7 +217,7 @@ if st.button("Generate PDF Performance Report"):
     pdf.set_font("Arial", size=8)
     pdf.cell(200, 6, "The gauges show key metrics for system autonomy and energy conversion efficiency.", ln=True)
     
-    pdf.ln(16)
+    pdf.ln(14)
     pdf.set_font("Arial", size=8)
     pdf.cell(200, 3, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True)
     pdf.cell(200, 3, "Coder: Victor Alvarez Melendez", ln=True)
