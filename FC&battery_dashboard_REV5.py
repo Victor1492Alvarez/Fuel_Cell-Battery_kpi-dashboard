@@ -17,7 +17,7 @@ col1, col2 = st.columns([4, 1])
 with col1:
     st.subheader("DMFC & Battery System Performance Analyzer")
 with col2:
-    st.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", width=100)
+    st.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", width=130)
 
 # 🔹 Help Section 1: App Introduction
 with st.expander("ℹ️ About This App"):
@@ -182,7 +182,7 @@ if st.button("Generate PDF Performance Report"):
     pdf.add_page()
     pdf.set_font("Arial", "B", 12)
     pdf.cell(10, 10, "Fuel Cell & Battery Performance System Report", ln=0)
-    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", x=150, y=7, w=35)
+    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", x=170, y=7, w=35)
     pdf.ln(12)
 
     pdf.set_font("Arial", "B", 11)
@@ -213,10 +213,10 @@ if st.button("Generate PDF Performance Report"):
     pdf.image("/tmp/battery_gauge.png", x=10, y=pdf.get_y(), w=105)
     pdf.image("/tmp/efficiency_gauge.png", x=110, y=pdf.get_y(), w=105)
 
-    pdf.ln(55)
+    pdf.ln(65)
     pdf.set_font("Arial", size=8)
     pdf.cell(200, 6, "The gauges show key metrics for system autonomy and energy conversion efficiency.", ln=True)
-    pdf.ln(2)
+    pdf.ln(20)
     pdf.set_font("Arial", size=8)
     pdf.cell(200, 4, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True)
     pdf.cell(200, 4, "Coder: Victor Alvarez Melendez", ln=True)
