@@ -89,7 +89,7 @@ with st.expander("What are the KPI Calculations about?"):
     3. Tank Autonomy [days] = Methanol Available / Daily Consumption.  
     4. Battery Autonomy [h] = Battery Capacity / Daily Energy × 24.  
     5. Battery Charge Time [h] = Energy Deficit / Fuel Cell Output.  
-    6. System Efficiency [%] = Useful Electrical Energy / Methanol Energy.
+    6. System Efficiency [%] = Electrical Energy delivered to system / Methanol Energy.
     """)
 
 # 🧾 Main Calculations
@@ -130,6 +130,12 @@ total_row = pd.DataFrame({
 df = pd.concat([df, total_row], ignore_index=True)
 st.dataframe(df.rename(columns={"name": "Device", "power": "Power (W)", "hours": "Hours"}))
 
+# 🔹 Help Section 4: Gauges Descriptions
+with st.expander("📊 How to interpret the chart gauges"):
+    st.markdown("""
+                The Battery Autonomy gauge estimates how long your system can run just on the battery power before requiring recharging. 
+                The System Efficiency gauge reflects how effectively methanol fuel is converted into usable electrical energy across the system.
+                """)
 # 📊 Gauges
 fig_batt = go.Figure(go.Indicator(
     mode="gauge+number",
@@ -164,12 +170,6 @@ fig_eff = go.Figure(go.Indicator(
 colg1, colg2 = st.columns(2)
 colg1.plotly_chart(fig_batt, use_container_width=True)
 colg2.plotly_chart(fig_eff, use_container_width=True)
-
-with st.expander("📊 How to interpret the chart gauges"):
-    st.markdown("""
-                The Battery Autonomy gauge estimates how long your system can run solely on battery power before requiring recharging. 
-                The System Efficiency gauge reflects how effectively methanol fuel is converted into usable electrical energy across the system.
-                """)
 
 # Save gauge images for PDF
 fig_batt.write_image("/tmp/battery_gauge.png")
