@@ -211,7 +211,7 @@ if st.button("Generate PDF Performance Report"):
         pdf.cell(200, 6, f"{row['Parameter']}: {row['Value']}", ln=True)
 
     pdf.ln(4)
-    pdf.image("/tmp/battery_gauge.png", x=5, y=pdf.get_y(), w=110)
+    pdf.image("/tmp/battery_gauge.png", x=0, y=pdf.get_y(), w=110)
     pdf.image("/tmp/efficiency_gauge.png", x=100, y=pdf.get_y(), w=110)
 
     pdf.ln(62)
