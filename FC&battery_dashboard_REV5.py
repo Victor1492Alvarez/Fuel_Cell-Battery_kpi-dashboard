@@ -13,7 +13,7 @@ from datetime import datetime
 
 st.set_page_config(page_title="Camping Truck System KPI Dashboard", layout="wide")
 st.markdown("<div style='display: flex; justify-content: space-between; align-items: center;'>"
-            "<h1 style='margin: 0;'>🔋 EFOY Hybrid System KPI Dashboard</h1>"
+            "<h1 style='margin: 0;'>🔋 Camping Trick System KPI Dashboard</h1>"
             "<img src='https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png' width='120'></div>", unsafe_allow_html=True)
 
 
@@ -78,7 +78,9 @@ methanol_per_day = calculate_methanol_consumption(daily_demand_wh)
 autonomy_days = calculate_tank_autonomy(selected_tank_liters, methanol_per_day)
 battery_hours = battery_discharge_time(daily_demand_wh)
 charge_time = battery_charge_time_needed(0)
-efficiency_pct = system_efficiency(daily_demand_wh / 1000, methanol_per_day)
+battery_energy_wh = min(BATTERY_CAPACITY_WH, daily_demand_wh)
+fuel_cell_energy_wh = max(0, daily_demand_wh - BATTERY_CAPACITY_WH)
+efficiency_pct = global_system_efficiency(battery_energy_wh, fuel_cell_energy_wh, methanol_per_day)
 
 # KPI display
 st.markdown("### 📊 Key Performance Indicators")
@@ -159,6 +161,8 @@ with st.expander("ℹ️ How to interpret the gauges"):
     **Global Efficiency Gauge**:
     Shows how much of the energy chemically stored in methanol is actually converted and delivered to your battery system. 
     Higher efficiency means better performance and optimized methanol use.
+
+    ⚙️ Efficiency adapts dynamically to changes in energy demand. As total appliance usage increases, the system consumes more methanol, and the balance between battery contribution and fuel cell generation shifts, impacting global efficiency. When the demand is low and fully covered by the battery, efficiency may appear as 0% since the fuel cell isn't active.
     """)
 
 # Scenario Summary Table
@@ -235,4 +239,3 @@ if st.button("Generate PDF Report"):
     pdf_bytes = pdf.output(dest='S').encode('latin1')
     st.download_button("📤 Download Report", data=pdf_bytes, file_name="efoy_kpi_report.pdf", mime="application/pdf")
     
-
