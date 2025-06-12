@@ -118,7 +118,7 @@ g1.plotly_chart(fig_battery, use_container_width=True)
 
 # Save both gauges as PNG for PDF export
 fig_battery.write_image("/tmp/battery_gauge.png")
-fig_eff.write_image("/tmp/efficiency_gauge.png")
+
 
 # Efficiency gauge
 eff_color = "red" if efficiency_pct < 0.2 else "orange" if efficiency_pct < 0.4 else "yellow" if efficiency_pct < 0.6 else "lightgreen"
@@ -139,6 +139,10 @@ fig_eff = go.Figure(go.Indicator(
     }
 ))
 g2.plotly_chart(fig_eff, use_container_width=True)
+
+# Save both gauges as PNG for PDF export
+fig_battery.write_image("/tmp/battery_gauge.png")
+fig_eff.write_image("/tmp/efficiency_gauge.png")
 
 # Expander explanation
 with st.expander("ℹ️ How to interpret the gauges"):
@@ -231,3 +235,4 @@ if st.button("Generate PDF Report"):
     pdf_bytes = pdf.output(dest='S').encode('latin1')
     st.download_button("📤 Download Report", data=pdf_bytes, file_name="efoy_kpi_report.pdf", mime="application/pdf")
     
+
