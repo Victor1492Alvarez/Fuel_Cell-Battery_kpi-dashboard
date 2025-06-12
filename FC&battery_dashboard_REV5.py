@@ -1,4 +1,4 @@
-# FC_Battery_Dashboard_REV6.py
+# FC_Battery_Dashboard_REV6.py (Full complete code with gauges, KPIs, expanders, PDF generation)
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -8,6 +8,7 @@ from datetime import datetime
 import requests
 import os
 from kpi_calculator_version2 import *
+import plotly.graph_objects as go
 
 st.set_page_config(page_title="EFOY Hybrid System Dashboard", layout="wide")
 st.title("🔋 Fuel Cell & Battery Hybrid KPI Dashboard")
@@ -52,14 +53,12 @@ else:
         {"name": "Radio (12 V)", "power": 5, "hours": 3},
     ]
 
-# Sliders for each appliance
 custom_appliances = []
 st.sidebar.header("Adjust Usage Hours")
 for app in appliances:
     h = st.sidebar.slider(f"{app['name']} Hours", 0.0, 24.0, float(app['hours']), 0.5)
     custom_appliances.append({"name": app['name'], "power": app['power'], "hours": h})
 
-# Calculations
 daily_demand_wh = calculate_daily_energy_demand(custom_appliances)
 methanol_per_day = calculate_methanol_consumption(daily_demand_wh)
 autonomy_days = calculate_tank_autonomy(20, methanol_per_day)
@@ -80,87 +79,80 @@ k4.metric("🔋 Battery Autonomy", f"{battery_hours:.1f} h")
 k5.metric("🌱 System Efficiency", f"{efficiency_pct*100:.1f}%")
 k6.metric("⚡ Battery Charge Time", f"{charge_time:.1f} h")
 
-# Prepare table
-summary_data = []
-total_power = total_energy = total_ah = 0
-for app in custom_appliances:
-    energy = app['power'] * app['hours']
-    ah = round(energy / BATTERY_VOLTAGE, 2)
-    total_power += app['power']
-    total_energy += energy
-    total_ah += ah
-    summary_data.append({
-        "Device": app['name'],
-        "Power (W)": app['power'],
-        "Hours": app['hours'],
-        "Energy (Wh)": round(energy, 1),
-        "Battery Capacity Used (Ah)": ah
-    })
-summary_data.append({
-    "Device": "TOTAL",
-    "Power (W)": total_power,
-    "Hours": "-",
-    "Energy (Wh)": round(total_energy, 1),
-    "Battery Capacity Used (Ah)": round(total_ah, 2)
-})
+# Gauges
+colg1, colg2 = st.columns(2)
+with colg1:
+    fig_batt = go.Figure(go.Indicator(
+        mode="gauge+number",
+        value=battery_hours,
+        title={'text': "Battery Autonomy (h)"},
+        gauge={
+            'axis': {'range': [0, 24]},
+            'bar': {'color': "#4CAF50"},
+            'steps': [
+                {'range': [0, 2.4], 'color': "gray"},
+                {'range': [2.4, 7.2], 'color': "red"},
+                {'range': [7.2, 12], 'color': "orange"},
+                {'range': [12, 19.2], 'color': "yellow"},
+                {'range': [19.2, 24], 'color': "green"},
+            ]
+        }))
+    st.plotly_chart(fig_batt, use_container_width=True)
+with colg2:
+    fig_eff = go.Figure(go.Indicator(
+        mode="gauge+number",
+        value=efficiency_pct * 100,
+        title={'text': "System Efficiency (%)"},
+        gauge={
+            'axis': {'range': [0, 100]},
+            'bar': {'color': "#2196F3"},
+            'steps': [
+                {'range': [0, 20], 'color': "red"},
+                {'range': [20, 50], 'color': "orange"},
+                {'range': [50, 80], 'color': "yellow"},
+                {'range': [80, 100], 'color': "green"},
+            ]
+        }))
+    st.plotly_chart(fig_eff, use_container_width=True)
 
-df_summary = pd.DataFrame(summary_data)
-st.markdown("### Appliance Energy Summary")
-st.dataframe(df_summary, use_container_width=True)
+with st.expander("ℹ️ How to interpret the gauges"):
+    st.markdown("The **Battery Autonomy** gauge estimates how long your system can run solely on battery power before requiring recharging. The **System Efficiency** gauge reflects how effectively methanol fuel is converted into usable electrical energy across the system.")
 
-# PDF Export
+# Save gauges for PDF
+fig_batt.write_image("/tmp/battery_gauge.png")
+fig_eff.write_image("/tmp/efficiency_gauge.png")
+
+# PDF Export Button
 st.markdown("### 📥 Export KPIs as PDF")
 if st.button("Generate PDF Report"):
-    from fpdf import FPDF
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_fill_color(220, 220, 220)
-    pdf.set_text_color(0)
-    pdf.set_font("Arial", '', 10)
-    pdf.set_font("Arial", 'B', 14)
-    pdf.cell(140, 10, "Fuel Cell & Battery Hybrid KPI Report", ln=0, align='L')
-    try:
-        logo_url = "https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png"
-        img_data = requests.get(logo_url).content
-        with open("/tmp/logo.png", "wb") as f:
-            f.write(img_data)
-        pdf.image("/tmp/logo.png", x=170, y=10, w=25)
-    except:
-        pass
+    pdf.set_font("Arial", "B", 14)
+    pdf.cell(140, 10, "EFOY KPI Report", ln=0)
+    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", x=170, y=10, w=25)
     pdf.ln(12)
-    pdf.set_font("Arial", '', 9)
-    pdf.cell(200, 6, f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}", ln=True)
-    pdf.cell(200, 6, "Coder: Victor Alvarez Melendez. Master Student in Hydrogen Technology.", ln=True)
-    pdf.cell(200, 6, "Technische Hochschule Rosenheim - Campus Burghausen. Bayern, Germany.", ln=True)
-    pdf.ln(5)
-    pdf.set_font("Arial", 'B', 11)
-    pdf.cell(200, 8, "Key Performance Indicators", ln=True)
-    pdf.set_font("Arial", '', 10)
+    pdf.set_font("Arial", size=11)
+    pdf.cell(200, 6, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True)
+    pdf.cell(200, 6, "Coder: Victor Alvarez Melendez", ln=True)
+    pdf.cell(200, 6, "Master Student in Hydrogen Technology", ln=True)
+    pdf.cell(200, 6, "Technische Hochschule Rosenheim - Campus Burghausen, Bayern, Germany", ln=True)
+    pdf.ln(6)
+    pdf.set_font("Arial", "B", 12)
+    pdf.cell(200, 6, "System KPIs", ln=True)
+    pdf.set_font("Arial", size=11)
     pdf.cell(200, 6, f"Daily Energy Demand: {daily_demand_wh:.0f} Wh", ln=True)
     pdf.cell(200, 6, f"Methanol Needed/Day: {methanol_per_day:.2f} L", ln=True)
     pdf.cell(200, 6, f"Tank Autonomy: {autonomy_days:.1f} days", ln=True)
-    pdf.cell(200, 6, f"Battery Runtime: {battery_hours:.1f} h", ln=True)
+    pdf.cell(200, 6, f"Battery Autonomy: {battery_hours:.1f} h", ln=True)
     pdf.cell(200, 6, f"System Efficiency: {efficiency_pct*100:.1f}%", ln=True)
     pdf.cell(200, 6, f"Battery Charge Time: {charge_time:.1f} h", ln=True)
     pdf.ln(4)
-    pdf.set_font("Arial", 'B', 11)
-    pdf.cell(200, 8, "Appliance Energy Summary", ln=True)
-    pdf.set_font("Arial", 'B', 9)
-    pdf.cell(60, 7, "Device", border=1, fill=True)
-    pdf.cell(25, 7, "Power (W)", border=1, fill=True)
-    pdf.cell(25, 7, "Hours", border=1, fill=True)
-    pdf.cell(35, 7, "Energy (Wh)", border=1, fill=True)
-    pdf.cell(45, 7, "Battery Use (Ah)", border=1, ln=True, fill=True)
-    pdf.set_font("Arial", '', 9)
-    for row in summary_data:
-        pdf.cell(60, 6, str(row['Device']), border=1)
-        pdf.cell(25, 6, str(row['Power (W)']), border=1)
-        pdf.cell(25, 6, str(row['Hours']), border=1)
-        pdf.cell(35, 6, str(row['Energy (Wh)']), border=1)
-        pdf.cell(45, 6, str(row['Battery Capacity Used (Ah)']), border=1, ln=True)
-    pdf.ln(2)
-    pdf.set_font("Arial", 'I', 8)
-    pdf.cell(200, 6, "Estimated values for academic and educational purposes only.", ln=True, align='C')
-    pdf_output = BytesIO()
-    pdf.output(pdf_output)
-    st.download_button("📤 Download Report", data=pdf_output.getvalue(), file_name="efoy_kpi_report.pdf", mime="application/pdf")
+    pdf.image("/tmp/battery_gauge.png", x=10, y=pdf.get_y(), w=90)
+    pdf.image("/tmp/efficiency_gauge.png", x=110, y=pdf.get_y(), w=90)
+    pdf.ln(55)
+    pdf.set_font("Arial", "I", 10)
+    pdf.cell(200, 6, "All values are estimated for academic and study purposes.", ln=True)
+
+    output = BytesIO()
+    pdf.output(output)
+    st.download_button("📤 Download Report", data=output.getvalue(), file_name="efoy_kpi_report.pdf", mime="application/pdf")
