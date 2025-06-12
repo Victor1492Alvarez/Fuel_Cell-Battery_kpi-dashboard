@@ -218,13 +218,13 @@ if st.button("Generate PDF Performance Report"):
     pdf.set_font("Arial", size=8)
     pdf.cell(200, 6, "The gauges show key metrics for system autonomy and energy conversion efficiency.", ln=True)
     
-    pdf.ln(10)
+    pdf.ln(14)
     pdf.set_font("Arial", size=8)
     pdf.cell(200, 3, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True)
     pdf.cell(200, 3, "Coder: Victor Alvarez Melendez", ln=True)
     pdf.cell(200, 3, "Master Student in Hydrogen Technology", ln=True)
     pdf.cell(200, 3, "Technische Hochschule Rosenheim - Campus Burghausen", ln=True)
-    pdf.cell(200, 25, "Thanks for using our App. Servus and enjoy your camping days in the Alps!.", ln=True)
+    pdf.cell(200, 35, "Thanks for using our App. Servus and enjoy your camping days in the Alps!.", ln=True)
 
     pdf_bytes = pdf.output(dest='S').encode('latin1')
     st.download_button("📥 Download PDF Report", data=pdf_bytes, file_name="efoy_kpi_report.pdf", mime="application/pdf")
