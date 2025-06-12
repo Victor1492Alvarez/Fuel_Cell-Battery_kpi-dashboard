@@ -180,6 +180,7 @@ st.markdown("### 📄 Export Full Report as PDF")
 if st.button("Generate PDF Performance Report"):
     pdf = FPDF()
     pdf.add_page()
+    pdf.set_auto_page_break(auto=False, margin=5)
     pdf.set_font("Arial", "B", 14)
     pdf.cell(10, 10, "Fuel Cell & Battery Performance System Report", ln=0)
     pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", x=170, y=4, w=35)
