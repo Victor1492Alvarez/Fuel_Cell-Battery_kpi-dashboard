@@ -212,7 +212,7 @@ if st.button("Generate PDF Performance Report"):
 
     pdf.ln(4)
     pdf.image("/tmp/battery_gauge.png", x=0, y=pdf.get_y(), w=110)
-    pdf.image("/tmp/efficiency_gauge.png", x=100, y=pdf.get_y(), w=110)
+    pdf.image("/tmp/efficiency_gauge.png", x=103, y=pdf.get_y(), w=110)
 
     pdf.ln(62)
     pdf.set_font("Arial", size=8)
