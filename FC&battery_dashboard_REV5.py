@@ -134,7 +134,7 @@ st.dataframe(df.rename(columns={"name": "Device", "power": "Power (W)", "hours":
 fig_batt = go.Figure(go.Indicator(
     mode="gauge+number",
     value=battery_hours,
-    title={'text': "Battery Autonomy (h)",'font': {'size': 20,'color': "black"}}
+    title={'text': "Battery Autonomy (h)",'font': {'size': 20,'color': "black"}},
     gauge={
         'axis': {'range': [0, 24]},
         'bar': {'color': "black"},
@@ -149,7 +149,7 @@ fig_batt = go.Figure(go.Indicator(
 fig_eff = go.Figure(go.Indicator(
     mode="gauge+number",
     value=efficiency_pct * 100,
-    title={'text': "System Efficiency (%)",'font': {'size': 20,'color': "black"}}
+    title={'text': "System Efficiency (%)",'font': {'size': 20,'color': "black"}},
     gauge={
         'axis': {'range': [0, 100]},
         'bar': {'color': "black"},
