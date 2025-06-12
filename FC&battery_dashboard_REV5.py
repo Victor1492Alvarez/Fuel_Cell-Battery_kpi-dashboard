@@ -82,7 +82,7 @@ with st.expander("System Constants (SFC Energy AG References)"):
     st.table(constants_df)
 
 # 🔹 Help Section 3: KPI Formula Descriptions
-with st.expander("📐 KPI Calculations Explained"):
+with st.expander("What are the KPI Calculations about?"):
     st.markdown("""
     1. Daily Energy Demand [Wh] = Σ(Power × Hours) for each device.  
     2. Methanol Consumption [L] = (Daily Energy / 1000) × 0.9 L/kWh.  
