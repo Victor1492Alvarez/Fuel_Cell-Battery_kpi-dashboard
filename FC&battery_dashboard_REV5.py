@@ -223,7 +223,7 @@ if st.button("Generate PDF Performance Report"):
     pdf.cell(200, 3, "Coder: Victor Alvarez Melendez", ln=True)
     pdf.cell(200, 3, "Master Student in Hydrogen Technology", ln=True)
     pdf.cell(200, 3, "Technische Hochschule Rosenheim - Campus Burghausen", ln=True)
-    pdf.cell(200, 4, "Thanks for using our App. Servus and enjoy your camping days in the Alps!.", ln=True)
+    pdf.cell(200, 14, "Thanks for using our App. Servus and enjoy your camping days in the Alps!.", ln=True)
 
     pdf_bytes = pdf.output(dest='S').encode('latin1')
     st.download_button("📥 Download PDF Report", data=pdf_bytes, file_name="efoy_kpi_report.pdf", mime="application/pdf")
