@@ -1,6 +1,6 @@
 # FC&Battery_dashboard_REV5.py
 import streamlit as st
-from kpi_calculator_version2 import *
+from kpi_calculator_version import *
 import matplotlib.pyplot as plt
 import pandas as pd
 from io import BytesIO
@@ -115,6 +115,10 @@ fig_battery = go.Figure(go.Indicator(
     }
 ))
 g1.plotly_chart(fig_battery, use_container_width=True)
+
+# Save both gauges as PNG for PDF export
+fig_battery.write_image("/tmp/battery_gauge.png")
+fig_eff.write_image("/tmp/efficiency_gauge.png")
 
 # Efficiency gauge
 eff_color = "red" if efficiency_pct < 0.2 else "orange" if efficiency_pct < 0.4 else "yellow" if efficiency_pct < 0.6 else "lightgreen"
