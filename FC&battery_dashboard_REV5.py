@@ -206,5 +206,6 @@ if st.button("Generate PDF Report"):
     pdf.multi_cell(0, 10, txt="Coder: Victor Alvarez Melendez. Master Student in Hydrogen Technology. Technische Hochschule Rosenheim - Campus Burghausen. Bayern, Germany.")
 
     pdf_output = BytesIO()
-    pdf.output(pdf_output)
+    pdf_bytes = pdf.output(dest='S').encode('latin1')
+    st.download_button("📤 Download Report", data=pdf_bytes, file_name="efoy_kpi_report.pdf", mime="application/pdf")
     st.download_button("📤 Download Report", data=pdf_output.getvalue(), file_name="efoy_kpi_report.pdf", mime="application/pdf")
