@@ -12,8 +12,10 @@ import plotly.graph_objects as go
 from datetime import datetime
 
 st.set_page_config(page_title="Camping Truck System KPI Dashboard", layout="wide")
-st.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", width=200)
-st.title("🔋 EFOY Hybrid System KPI Dashboard")
+st.markdown("<div style='display: flex; justify-content: space-between; align-items: center;'>"
+            "<h1 style='margin: 0;'>🔋 EFOY Hybrid System KPI Dashboard</h1>"
+            "<img src='https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png' width='120'></div>", unsafe_allow_html=True)
+
 
 # Informational expander
 with st.expander("ℹ️ How does this simulation work?"):
@@ -66,7 +68,7 @@ daily_demand_wh = calculate_daily_energy_demand(appliances)
 methanol_per_day = calculate_methanol_consumption(daily_demand_wh)
 autonomy_days = calculate_tank_autonomy(selected_tank_liters, methanol_per_day)
 battery_hours = battery_discharge_time(daily_demand_wh)
-charge_time = battery_charge_time_needed(battery_hours)
+charge_time = battery_charge_time_needed(daily_demand_wh)
 efficiency_pct = system_efficiency(daily_demand_wh / 1000, methanol_per_day)
 
 # KPI display
