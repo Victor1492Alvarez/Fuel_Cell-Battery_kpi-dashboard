@@ -10,7 +10,7 @@ import os
 from kpi_calculator_version2 import *
 import plotly.graph_objects as go
 
-st.set_page_config(page_title="EFOY Hybrid System Dashboard", layout="wide")
+st.set_page_config(page_title="Camping Truck System", layout="wide")
 st.title("🔋 Fuel Cell & Battery Hybrid KPI Dashboard")
 
 col1, col2 = st.columns([4, 1])
