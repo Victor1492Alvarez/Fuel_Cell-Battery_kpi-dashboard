@@ -12,7 +12,7 @@ import plotly.graph_objects as go
 from datetime import datetime
 
 st.set_page_config(page_title="Camping Truck System KPI Dashboard", layout="wide")
-st.image("https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/dashboard_logo.png", width=200)
+st.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", width=200)
 st.title("🔋 EFOY Hybrid System KPI Dashboard")
 
 # Informational expander
@@ -30,8 +30,44 @@ with st.expander("ℹ️ How does this simulation work?"):
     📤 A full PDF report can be generated including a breakdown of indicators and system assumptions.
     """)
 
-# [sidebar and scenario logic remains unchanged here...]
-# -- omitted for brevity, assumed present --
+# Sidebar scenario selector and appliance loading
+scenario = st.sidebar.selectbox("Select Use Scenario", ["Base", "Moderate", "Peak"])
+
+if scenario == "Base":
+    appliances = [
+        {"name": "Fridge", "power": 45, "hours": 24},
+        {"name": "Lights", "power": 10, "hours": 4},
+        {"name": "Laptop", "power": 60, "hours": 2},
+        {"name": "Heater Fan", "power": 250, "hours": 1},
+        {"name": "Water Pump", "power": 50, "hours": 0.5},
+    ]
+elif scenario == "Moderate":
+    appliances = [
+        {"name": "Fridge", "power": 45, "hours": 24},
+        {"name": "Lights", "power": 10, "hours": 6},
+        {"name": "Laptop", "power": 60, "hours": 4},
+        {"name": "Heater Fan", "power": 250, "hours": 2},
+        {"name": "Water Pump", "power": 50, "hours": 0.5},
+        {"name": "TV", "power": 80, "hours": 2},
+    ]
+else:
+    appliances = [
+        {"name": "Fridge", "power": 45, "hours": 24},
+        {"name": "Lights", "power": 10, "hours": 10},
+        {"name": "Laptop", "power": 60, "hours": 6},
+        {"name": "Heater Fan", "power": 250, "hours": 3},
+        {"name": "Water Pump", "power": 50, "hours": 1},
+        {"name": "TV", "power": 80, "hours": 3},
+        {"name": "Electric Blanket", "power": 100, "hours": 4}
+    ]
+
+selected_tank_liters = 20  # For example, 2 × M10
+daily_demand_wh = calculate_daily_energy_demand(appliances)
+methanol_per_day = calculate_methanol_consumption(daily_demand_wh)
+autonomy_days = calculate_tank_autonomy(selected_tank_liters, methanol_per_day)
+battery_hours = battery_discharge_time(daily_demand_wh)
+charge_time = battery_charge_time_needed(battery_hours)
+efficiency_pct = system_efficiency(daily_demand_wh / 1000, methanol_per_day)
 
 # KPI display
 st.markdown("### 📊 Key Performance Indicators")
@@ -105,6 +141,12 @@ with st.expander("ℹ️ How to interpret the gauges"):
     Shows how much of the energy chemically stored in methanol is actually converted and delivered to your battery system. 
     Higher efficiency means better performance and optimized methanol use.
     """)
+
+# Scenario Summary Table
+st.markdown("### 🧾 Appliance Energy Summary")
+summary_df = pd.DataFrame(appliances)
+summary_df["Energy (Wh)"] = summary_df["power"] * summary_df["hours"]
+st.dataframe(summary_df, use_container_width=True)
 
 # KPI Formula Explanation
 with st.expander("📘 KPI Calculation Formulas"):
