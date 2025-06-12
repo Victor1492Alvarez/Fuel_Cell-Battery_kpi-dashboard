@@ -55,3 +55,10 @@ def global_system_efficiency(battery_energy_wh: float, fuel_cell_energy_wh: floa
 def battery_charge_time_needed(energy_to_charge_wh: float, fuel_cell_output_w: float = FUEL_CELL_OUTPUT_W) -> float:
     return energy_to_charge_wh / fuel_cell_output_w
 
+def system_efficiency(energy_delivered_kwh: float, methanol_liters: float) -> float:
+    if methanol_liters == 0:
+        return 0.0
+    chemical_energy_kwh = methanol_liters * METHANOL_ENERGY_DENSITY  # 1.1 kWh/l
+    return energy_delivered_kwh / chemical_energy_kwh
+
+
