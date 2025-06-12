@@ -1,241 +1,166 @@
-# FC&Battery_dashboard_REV5.py
+# FC_Battery_Dashboard_REV6.py
 import streamlit as st
-from kpi_calculator_version2 import *
-import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
 from io import BytesIO
 from fpdf import FPDF
-import requests
-from PIL import Image
-import os
-import plotly.graph_objects as go
 from datetime import datetime
+import requests
+import os
+from kpi_calculator_version2 import *
 
-st.set_page_config(page_title="Camping Truck System KPI Dashboard", layout="wide")
-st.markdown("<div style='display: flex; justify-content: space-between; align-items: center;'>"
-            "<h1 style='margin: 0;'>🔋 Camping Trick System KPI Dashboard</h1>"
-            "<img src='https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png' width='120'></div>", unsafe_allow_html=True)
+st.set_page_config(page_title="EFOY Hybrid System Dashboard", layout="wide")
+st.title("🔋 Fuel Cell & Battery Hybrid KPI Dashboard")
 
+col1, col2 = st.columns([4, 1])
+with col1:
+    st.subheader("System Performance Analyzer")
+with col2:
+    st.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", width=100)
 
-# Informational expander
-with st.expander("ℹ️ How does this simulation work?"):
-    st.markdown("""
-    This interactive dashboard simulates the performance of a hybrid off-grid energy system composed of:
+# Sidebar - Scenario Selection
+scenario = st.sidebar.selectbox("Select Load Scenario", ["Base", "Moderate", "Peak"])
 
-    - A **Direct Methanol Fuel Cell (EFOY Pro 2800)** that converts methanol into electrical energy
-    - A **LiFePO₄ lithium battery (EFOY Li 105)** used to store and supply power to all appliances
-
-    ⚙️ The DMFC **does not directly power the loads**. Instead, it continuously charges the battery. All loads draw energy **only from the battery**.
-
-    🧪 This tool estimates energy demands, methanol consumption, battery autonomy, system efficiency, and more — using customizable appliance profiles.
-
-    📤 A full PDF report can be generated including a breakdown of indicators and system assumptions.
-    """)
-
-# Sidebar scenario selector and appliance loading
-scenario = st.sidebar.selectbox("Select Use Scenario", ["Base", "Moderate", "Peak"])
-
+# Define appliances by scenario
 if scenario == "Base":
     appliances = [
-        {"name": "Fridge", "power": 45, "hours": st.sidebar.slider("Fridge (Base)", 0.0, 24.0, 24.0, 0.5)},
-        {"name": "Lights", "power": 10, "hours": st.sidebar.slider("Lights (Base)", 0.0, 24.0, 4.0, 0.5)},
-        {"name": "Laptop", "power": 60, "hours": st.sidebar.slider("Laptop (Base)", 0.0, 24.0, 2.0, 0.5)},
-        {"name": "Heater Fan", "power": 250, "hours": st.sidebar.slider("Heater Fan (Base)", 0.0, 24.0, 1.0, 0.5)},
-        {"name": "Water Pump", "power": 50, "hours": st.sidebar.slider("Water Pump (Base)", 0.0, 24.0, 0.5, 0.5)}
+        {"name": "Laptop (230 V)", "power": 95, "hours": 4},
+        {"name": "Led Lighting (12 V)", "power": 15, "hours": 6},
+        {"name": "Cool box (12 V)", "power": 60, "hours": 8},
+        {"name": "Smartphone (2 chargers)", "power": 25, "hours": 2},
+        {"name": "Electric kettle (12 V)", "power": 300, "hours": 0.5},
+        {"name": "Radio (12 V)", "power": 5, "hours": 3},
     ]
 elif scenario == "Moderate":
     appliances = [
-        {"name": "Fridge", "power": 45, "hours": st.sidebar.slider("Fridge (Moderate)", 0.0, 24.0, 24.0, 0.5)},
-        {"name": "Lights", "power": 10, "hours": st.sidebar.slider("Lights (Moderate)", 0.0, 24.0, 6.0, 0.5)},
-        {"name": "Laptop", "power": 60, "hours": st.sidebar.slider("Laptop (Moderate)", 0.0, 24.0, 4.0, 0.5)},
-        {"name": "Heater Fan", "power": 250, "hours": st.sidebar.slider("Heater Fan (Moderate)", 0.0, 24.0, 2.0, 0.5)},
-        {"name": "Water Pump", "power": 50, "hours": st.sidebar.slider("Water Pump (Moderate)", 0.0, 24.0, 0.5, 0.5)},
-        {"name": "TV", "power": 80, "hours": st.sidebar.slider("TV (Moderate)", 0.0, 24.0, 2.0, 0.5)}
+        {"name": "Laptop (230 V)", "power": 15, "hours": 4},
+        {"name": "Led Lighting (12 V)", "power": 95, "hours": 6},
+        {"name": "Cool box (12 V)", "power": 60, "hours": 8},
+        {"name": "Bed warmer (12 V)", "power": 240, "hours": 3},
+        {"name": "Smartphone (3 chargers)", "power": 35, "hours": 2},
+        {"name": "Electric kettle (12 V)", "power": 300, "hours": 0.5},
+        {"name": "Radio (12 V)", "power": 5, "hours": 3},
     ]
 else:
     appliances = [
-        {"name": "Fridge", "power": 45, "hours": st.sidebar.slider("Fridge (Peak)", 0.0, 24.0, 24.0, 0.5)},
-        {"name": "Lights", "power": 10, "hours": st.sidebar.slider("Lights (Peak)", 0.0, 24.0, 10.0, 0.5)},
-        {"name": "Laptop", "power": 60, "hours": st.sidebar.slider("Laptop (Peak)", 0.0, 24.0, 6.0, 0.5)},
-        {"name": "Heater Fan", "power": 250, "hours": st.sidebar.slider("Heater Fan (Peak)", 0.0, 24.0, 3.0, 0.5)},
-        {"name": "Water Pump", "power": 50, "hours": st.sidebar.slider("Water Pump (Peak)", 0.0, 24.0, 1.0, 0.5)},
-        {"name": "TV", "power": 80, "hours": st.sidebar.slider("TV (Peak)", 0.0, 24.0, 3.0, 0.5)},
-        {"name": "Electric Blanket", "power": 100, "hours": st.sidebar.slider("Electric Blanket (Peak)", 0.0, 24.0, 4.0, 0.5)}
-    ]
-    appliances = [
-        {"name": "Fridge", "power": 45, "hours": 24},
-        {"name": "Lights", "power": 10, "hours": 10},
-        {"name": "Laptop", "power": 60, "hours": 6},
-        {"name": "Heater Fan", "power": 250, "hours": 3},
-        {"name": "Water Pump", "power": 50, "hours": 1},
-        {"name": "TV", "power": 80, "hours": 3},
-        {"name": "Electric Blanket", "power": 100, "hours": 4}
+        {"name": "Laptop (230 V)", "power": 15, "hours": 4},
+        {"name": "Led Lighting (12 V)", "power": 95, "hours": 6},
+        {"name": "Cool box (12 V)", "power": 60, "hours": 8},
+        {"name": "Fan Heater (12 V)", "power": 490, "hours": 2},
+        {"name": "Smartphone (3 chargers)", "power": 35, "hours": 2},
+        {"name": "Electric kettle (12 V)", "power": 300, "hours": 0.5},
+        {"name": "Radio (12 V)", "power": 5, "hours": 3},
     ]
 
-selected_tank_liters = 20  # For example, 2 × M10
-daily_demand_wh = calculate_daily_energy_demand(appliances)
+# Sliders for each appliance
+custom_appliances = []
+st.sidebar.header("Adjust Usage Hours")
+for app in appliances:
+    h = st.sidebar.slider(f"{app['name']} Hours", 0.0, 24.0, float(app['hours']), 0.5)
+    custom_appliances.append({"name": app['name'], "power": app['power'], "hours": h})
+
+# Calculations
+daily_demand_wh = calculate_daily_energy_demand(custom_appliances)
 methanol_per_day = calculate_methanol_consumption(daily_demand_wh)
-autonomy_days = calculate_tank_autonomy(selected_tank_liters, methanol_per_day)
+autonomy_days = calculate_tank_autonomy(20, methanol_per_day)
 battery_hours = battery_discharge_time(daily_demand_wh)
-charge_time = battery_charge_time_needed(0)
 battery_energy_wh = min(BATTERY_CAPACITY_WH, daily_demand_wh)
 fuel_cell_energy_wh = max(0, daily_demand_wh - BATTERY_CAPACITY_WH)
 efficiency_pct = global_system_efficiency(battery_energy_wh, fuel_cell_energy_wh, methanol_per_day)
+battery_deficit = max(0, daily_demand_wh - BATTERY_CAPACITY_WH)
+charge_time = battery_charge_time_needed(battery_deficit)
 
-# KPI display
-st.markdown("### 📊 Key Performance Indicators")
+# KPIs
 k1, k2, k3 = st.columns(3)
 k1.metric("🔋 Daily Energy Demand", f"{daily_demand_wh:.0f} Wh")
 k2.metric("🧪 Methanol Needed/Day", f"{methanol_per_day:.2f} L")
 k3.metric("🛢️ Tank Autonomy", f"{autonomy_days:.1f} days")
 k4, k5, k6 = st.columns(3)
-k4.metric("🔋 Battery Remaining Autonomy", f"{battery_hours:.1f} h")
-k5.metric("🔁 Battery Charge Time (DMFC)", f"{charge_time:.1f} h")
-k6.metric("🌱 System Efficiency", f"{efficiency_pct*100:.1f}%")
+k4.metric("🔋 Battery Autonomy", f"{battery_hours:.1f} h")
+k5.metric("🌱 System Efficiency", f"{efficiency_pct*100:.1f}%")
+k6.metric("⚡ Battery Charge Time", f"{charge_time:.1f} h")
 
-# 🔄 Dual Gauge Display
-st.markdown("### 📉 System Gauges")
-g1, g2 = st.columns(2)
+# Prepare table
+summary_data = []
+total_power = total_energy = total_ah = 0
+for app in custom_appliances:
+    energy = app['power'] * app['hours']
+    ah = round(energy / BATTERY_VOLTAGE, 2)
+    total_power += app['power']
+    total_energy += energy
+    total_ah += ah
+    summary_data.append({
+        "Device": app['name'],
+        "Power (W)": app['power'],
+        "Hours": app['hours'],
+        "Energy (Wh)": round(energy, 1),
+        "Battery Capacity Used (Ah)": ah
+    })
+summary_data.append({
+    "Device": "TOTAL",
+    "Power (W)": total_power,
+    "Hours": "-",
+    "Energy (Wh)": round(total_energy, 1),
+    "Battery Capacity Used (Ah)": round(total_ah, 2)
+})
 
-# Battery gauge
-color_zone = "gray" if battery_hours < 2.4 else "red" if battery_hours < 7.2 else "orange" if battery_hours < 12 else "yellow" if battery_hours < 19.2 else "green"
-fig_battery = go.Figure(go.Indicator(
-    mode="gauge+number",
-    value=battery_hours,
-    domain={'x': [0, 1], 'y': [0, 1]},
-    title={'text': "Battery Remaining Hours"},
-    gauge={
-        'axis': {'range': [0, 24]},
-        'bar': {'color': color_zone},
-        'steps': [
-            {'range': [0, 2.4], 'color': 'lightgray'},
-            {'range': [2.4, 7.2], 'color': 'lightcoral'},
-            {'range': [7.2, 12], 'color': 'orange'},
-            {'range': [12, 19.2], 'color': 'yellow'},
-            {'range': [19.2, 24], 'color': 'lightgreen'}
-        ]
-    }
-))
-g1.plotly_chart(fig_battery, use_container_width=True)
+df_summary = pd.DataFrame(summary_data)
+st.markdown("### Appliance Energy Summary")
+st.dataframe(df_summary, use_container_width=True)
 
-# Save both gauges as PNG for PDF export
-fig_battery.write_image("/tmp/battery_gauge.png")
-
-
-# Efficiency gauge
-eff_color = "red" if efficiency_pct < 0.2 else "orange" if efficiency_pct < 0.4 else "yellow" if efficiency_pct < 0.6 else "lightgreen"
-fig_eff = go.Figure(go.Indicator(
-    mode="gauge+number",
-    value=efficiency_pct * 100,
-    domain={'x': [0, 1], 'y': [0, 1]},
-    title={'text': "Global System Efficiency (%)"},
-    gauge={
-        'axis': {'range': [0, 100]},
-        'bar': {'color': eff_color},
-        'steps': [
-            {'range': [0, 20], 'color': 'lightcoral'},
-            {'range': [20, 40], 'color': 'orange'},
-            {'range': [40, 60], 'color': 'yellow'},
-            {'range': [60, 100], 'color': 'lightgreen'}
-        ]
-    }
-))
-g2.plotly_chart(fig_eff, use_container_width=True)
-
-# Save both gauges as PNG for PDF export
-fig_battery.write_image("/tmp/battery_gauge.png")
-fig_eff.write_image("/tmp/efficiency_gauge.png")
-
-# Expander explanation
-with st.expander("ℹ️ How to interpret the gauges"):
-    st.markdown("""
-    **Battery Remaining Hours Gauge**: 
-    Indicates how many hours of autonomy remain based on current daily consumption. Colored zones guide urgency: 
-
-    - Gray: <10% → Critical battery
-    - Red: 10–30%
-    - Orange: 30–50%
-    - Yellow: 50–80%
-    - Green: >80% → Fully available
-
-    **Global Efficiency Gauge**:
-    Shows how much of the energy chemically stored in methanol is actually converted and delivered to your battery system. 
-    Higher efficiency means better performance and optimized methanol use.
-
-    ⚙️ Efficiency adapts dynamically to changes in energy demand. As total appliance usage increases, the system consumes more methanol, and the balance between battery contribution and fuel cell generation shifts, impacting global efficiency. When the demand is low and fully covered by the battery, efficiency may appear as 0% since the fuel cell isn't active.
-    """)
-
-# Scenario Summary Table
-st.markdown("### 🧾 Appliance Energy Summary")
-summary_df = pd.DataFrame(appliances)
-summary_df["Energy (Wh)"] = summary_df["power"] * summary_df["hours"]
-st.dataframe(summary_df, use_container_width=True)
-
-# KPI Formula Explanation
-with st.expander("📘 KPI Calculation Formulas"):
-    st.markdown("""
-    **Daily Energy Demand (Wh)** = sum of (Device Power × Hours of Use)
-
-    **Methanol Needed/Day (L)** = Energy Demand (Wh) / Fuel Cell Conversion Rate (approx. 950 Wh/L)
-
-    **Tank Autonomy (days)** = Methanol Volume Available / Daily Methanol Consumption
-
-    **Battery Remaining Autonomy (h)** = Available Battery Energy (Wh) / Average Power Consumption (W)
-
-    **Battery Charge Time (h)** = (Battery Capacity - Remaining Energy) / Fuel Cell Output Power
-
-    **Global Efficiency (%)** = Delivered Energy to Loads / Chemical Energy Input (from Methanol)
-    """)
-
-# PDF export with logo and disclaimer
+# PDF Export
 st.markdown("### 📥 Export KPIs as PDF")
 if st.button("Generate PDF Report"):
+    from fpdf import FPDF
     pdf = FPDF()
     pdf.add_page()
-    logo_url = "https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png"
+    pdf.set_fill_color(220, 220, 220)
+    pdf.set_text_color(0)
+    pdf.set_font("Arial", '', 10)
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(140, 10, "Fuel Cell & Battery Hybrid KPI Report", ln=0, align='L')
     try:
-        logo_data = requests.get(logo_url).content
-        logo_path = "/tmp/dashboard_logo.png"
-        with open(logo_path, "wb") as f:
-            f.write(logo_data)
-        pdf.image(logo_path, x=160, y=10, w=30)
+        logo_url = "https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png"
+        img_data = requests.get(logo_url).content
+        with open("/tmp/logo.png", "wb") as f:
+            f.write(img_data)
+        pdf.image("/tmp/logo.png", x=170, y=10, w=25)
     except:
         pass
-    pdf.set_font("Arial", size=12)
-    pdf.ln(10)
-    pdf.cell(200, 10, txt="EFOY KPI Report", ln=True, align='C')
-    pdf.ln(10)
-    pdf.cell(200, 10, txt=f"Daily Energy Demand: {daily_demand_wh:.0f} Wh", ln=True)
-    pdf.cell(200, 10, txt=f"Methanol Needed/Day: {methanol_per_day:.2f} L", ln=True)
-    pdf.cell(200, 10, txt=f"Tank Autonomy: {autonomy_days:.1f} days", ln=True)
-    pdf.cell(200, 10, txt=f"Battery Remaining Autonomy: {battery_hours:.1f} h", ln=True)
-    pdf.cell(200, 10, txt=f"Battery Charge Time (DMFC): {charge_time:.1f} h", ln=True)
-    pdf.cell(200, 10, txt=f"Global System Efficiency: {efficiency_pct*100:.1f}%", ln=True)
-
-    # Insert gauge image placeholder
-    pdf.ln(10)
-    pdf.set_font("Arial", 'B', 11)
-    pdf.cell(95, 10, txt="Battery Autonomy Gauge", ln=0)
-    pdf.cell(95, 10, txt="System Efficiency Gauge", ln=1)
-    pdf.image("/tmp/battery_gauge.png", x=10, y=pdf.get_y(), w=90)
-    pdf.image("/tmp/efficiency_gauge.png", x=110, y=pdf.get_y(), w=90)
-    pdf.ln(60)
+    pdf.ln(12)
+    pdf.set_font("Arial", '', 9)
+    pdf.cell(200, 6, f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}", ln=True)
+    pdf.cell(200, 6, "Coder: Victor Alvarez Melendez. Master Student in Hydrogen Technology.", ln=True)
+    pdf.cell(200, 6, "Technische Hochschule Rosenheim - Campus Burghausen. Bayern, Germany.", ln=True)
     pdf.ln(5)
-    pdf.set_font("Arial", size=10)
-    pdf.multi_cell(0, 10, txt="Battery gauge represents remaining hours of autonomy based on current usage. Efficiency gauge reflects how effectively the methanol is converted to usable energy. Ranges are color coded for quick interpretation.")
+    pdf.set_font("Arial", 'B', 11)
+    pdf.cell(200, 8, "Key Performance Indicators", ln=True)
+    pdf.set_font("Arial", '', 10)
+    pdf.cell(200, 6, f"Daily Energy Demand: {daily_demand_wh:.0f} Wh", ln=True)
+    pdf.cell(200, 6, f"Methanol Needed/Day: {methanol_per_day:.2f} L", ln=True)
+    pdf.cell(200, 6, f"Tank Autonomy: {autonomy_days:.1f} days", ln=True)
+    pdf.cell(200, 6, f"Battery Runtime: {battery_hours:.1f} h", ln=True)
+    pdf.cell(200, 6, f"System Efficiency: {efficiency_pct*100:.1f}%", ln=True)
+    pdf.cell(200, 6, f"Battery Charge Time: {charge_time:.1f} h", ln=True)
     pdf.ln(4)
-    pdf.set_text_color(100, 100, 100)
-    pdf.set_font("Arial", style='I', size=9)
-    pdf.multi_cell(0, 10, txt="Note: All values are estimated for educational and academic purposes only.")
-    pdf.ln(3)
-    pdf.set_text_color(0, 0, 0)
-    pdf.set_font("Arial", style='', size=9)
-    timestamp = datetime.now().strftime("Generated on %Y-%m-%d at %H:%M")
-    pdf.cell(200, 10, txt=timestamp, ln=True)
-    pdf.set_font("Arial", style='I', size=9)
-    pdf.multi_cell(0, 10, txt="Coder: Victor Alvarez Melendez. Master Student in Hydrogen Technology. Technische Hochschule Rosenheim - Campus Burghausen. Bayern, Germany.")
-
+    pdf.set_font("Arial", 'B', 11)
+    pdf.cell(200, 8, "Appliance Energy Summary", ln=True)
+    pdf.set_font("Arial", 'B', 9)
+    pdf.cell(60, 7, "Device", border=1, fill=True)
+    pdf.cell(25, 7, "Power (W)", border=1, fill=True)
+    pdf.cell(25, 7, "Hours", border=1, fill=True)
+    pdf.cell(35, 7, "Energy (Wh)", border=1, fill=True)
+    pdf.cell(45, 7, "Battery Use (Ah)", border=1, ln=True, fill=True)
+    pdf.set_font("Arial", '', 9)
+    for row in summary_data:
+        pdf.cell(60, 6, str(row['Device']), border=1)
+        pdf.cell(25, 6, str(row['Power (W)']), border=1)
+        pdf.cell(25, 6, str(row['Hours']), border=1)
+        pdf.cell(35, 6, str(row['Energy (Wh)']), border=1)
+        pdf.cell(45, 6, str(row['Battery Capacity Used (Ah)']), border=1, ln=True)
+    pdf.ln(2)
+    pdf.set_font("Arial", 'I', 8)
+    pdf.cell(200, 6, "Estimated values for academic and educational purposes only.", ln=True, align='C')
     pdf_output = BytesIO()
-    pdf_bytes = pdf.output(dest='S').encode('latin1')
-    st.download_button("📤 Download Report", data=pdf_bytes, file_name="efoy_kpi_report.pdf", mime="application/pdf")
-    
+    pdf.output(pdf_output)
+    st.download_button("📤 Download Report", data=pdf_output.getvalue(), file_name="efoy_kpi_report.pdf", mime="application/pdf")
