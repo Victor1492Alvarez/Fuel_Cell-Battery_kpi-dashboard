@@ -179,6 +179,19 @@ fig_eff.write_image("/tmp/efficiency_gauge.png")
 # PDF Report
 st.markdown("### 📄 Export Report as PDF")
 if st.button("Generate PDF Performance Report"):
+    # Descargar imagen adicional desde GitHub y guardarla temporalmente
+img_url = "https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/wiring_diagram_1.jpg"
+img_path = "/tmp/wiring_diagram_1.jpg"
+
+try:
+    response = requests.get(img_url)
+    response.raise_for_status()  # Lanza excepción si la descarga falla
+    with open(img_path, "wb") as f:
+        f.write(response.content)
+except Exception as e:
+    st.error(f"❌ No se pudo descargar la imagen del diagrama: {e}")
+    img_path = None  # Marca que no se pudo usar
+
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=False, margin=5)
