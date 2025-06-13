@@ -30,6 +30,7 @@ with st.expander("ℹ️ About This App"):
     """)
 
 # Sidebar - Scenario Selection
+st.sidebar.header("Adjust Scenarios and Methanol Storage")
 scenario = st.sidebar.selectbox("Select Load Scenario", ["Base 500 W", "Moderate 750 W", "Peak 1000 W"])
 
 # Sidebar - Methanol Tank Size Selection
