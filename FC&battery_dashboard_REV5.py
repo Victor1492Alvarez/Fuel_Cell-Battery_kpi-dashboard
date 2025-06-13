@@ -194,8 +194,8 @@ if st.button("Generate PDF Performance Report"):
         logo_path = None
 
     # Descargar diagrama wiring (PNG)
-    diagram_url = "https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/wiring_diagram_1.png"
-    diagram_path = "/tmp/wiring_diagram_1.png"
+    diagram_url = "https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/IMG_0384.jpg"
+    diagram_path = "/tmp/IMG_0384.jpg"
     diagram_downloaded = False
     try:
         response = requests.get(diagram_url)
