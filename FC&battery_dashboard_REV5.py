@@ -17,7 +17,7 @@ col1, col2 = st.columns([4, 1])
 with col1:
     st.subheader("DMFC & Battery System Performance Analyzer")
 with col2:
-    st.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.png", width=130)
+    st.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.PNG", width=130)
 
 # 🔹 Help Section 1: App Introduction
 with st.expander("ℹ️ About This App"):
@@ -217,7 +217,7 @@ if st.button("Generate PDF Performance Report"):
     pdf.cell(10, 10, "Fuel Cell & Battery Performance System Report", ln=0)
     if logo_path and os.path.exists(logo_path):
         try:
-            pdf.image(logo_path, x=140, y=4, w=35)
+            pdf.image(logo_path, x=180, y=4, w=35)
         except Exception as e:
             st.warning(f"⚠️ No se pudo insertar el logo: {e}")
     pdf.ln(12)
@@ -260,7 +260,7 @@ if st.button("Generate PDF Performance Report"):
             pdf.ln(10)
             pdf.set_font("Arial", "B", 11)
             pdf.cell(200, 6, "Wiring Diagram", ln=True)
-            pdf.image(diagram_path, x=100, y=pdf.get_y(), w=100)
+            pdf.image(diagram_path, x=100, y=100, w=100)
         except Exception as e:
             st.warning(f"⚠️ No se pudo insertar el wiring diagram en el PDF: {e}")
 
