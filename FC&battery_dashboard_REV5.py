@@ -178,26 +178,26 @@ fig_eff.write_image("/tmp/efficiency_gauge.png")
 
 # PDF Report
 st.markdown("### 📄 Export Report as PDF")
-    if st.button("Generate PDF Performance Report"):
-    # Descargar imagen adicional desde GitHub y guardarla temporalmente
-    img_url = "https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/wiring_diagram_1.jpg"
-    img_path = "/tmp/wiring_diagram_1.jpg"
+if st.button("Generate PDF Performance Report"):
+    # Descargar imagen adicional desde GitHub
+    diagram_url = "https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/wiring_diagram_1.jpg"
+    diagram_path = "/tmp/wiring_diagram_1.jpg"
+    try:
+        response = requests.get(diagram_url)
+        response.raise_for_status()
+        with open(diagram_path, "wb") as f:
+            f.write(response.content)
+    except Exception as e:
+        st.error(f"❌ Error al descargar el wiring diagram: {e}")
+        diagram_path = None
 
-        try:
-        response = requests.get(img_url)
-        response.raise_for_status()  # Lanza excepción si la descarga falla
-        with open(img_path, "wb") as f:
-        f.write(response.content)
-        except Exception as e:
-        st.error(f"❌ No se pudo descargar la imagen del diagrama: {e}")
-        img_path = None  # Marca que no se pudo usar
-
+    # Crear PDF
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=False, margin=5)
     pdf.set_font("Arial", "B", 14)
     pdf.cell(10, 10, "Fuel Cell & Battery Performance System Report", ln=0)
-    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.PNG", x=100, y=4, w=80)
+    pdf.image("/tmp/dashboard_logo.png", x=100, y=4, w=80)
     pdf.ln(12)
 
     pdf.set_font("Arial", "B", 11)
@@ -218,7 +218,6 @@ st.markdown("### 📄 Export Report as PDF")
         pdf.cell(200, 6, f"{row['name']}: {row['power']}W x {row['hours']}h = {row['Energy (Wh)']:.0f}Wh | {row['Battery Capacity Used (Ah)']:.1f}Ah", ln=True)
 
     pdf.ln(4)
-    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.PNG", x=100, y=4, w=80)
     pdf.set_font("Arial", "B", 11)
     pdf.cell(200, 6, "System Constants", ln=True)
     pdf.set_font("Arial", size=10)
@@ -232,7 +231,14 @@ st.markdown("### 📄 Export Report as PDF")
     pdf.ln(62)
     pdf.set_font("Arial", size=8)
     pdf.cell(200, 6, "The gauges show key metrics for system autonomy and energy conversion efficiency.", ln=True)
-    
+
+    # ⬇️ Wiring Diagram
+    if diagram_path:
+        pdf.ln(10)
+        pdf.set_font("Arial", "B", 11)
+        pdf.cell(200, 6, "Wiring Diagram", ln=True)
+        pdf.image(diagram_path, x=10, y=pdf.get_y(), w=190)
+
     pdf.ln(16)
     pdf.set_font("Arial","B", size=8)
     pdf.cell(200, 3, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}. Values strictly estimated for academic purposes", ln=True)
@@ -241,5 +247,6 @@ st.markdown("### 📄 Export Report as PDF")
     pdf.cell(200, 3, "Technische Hochschule Rosenheim - Campus Burghausen", ln=True)
     pdf.cell(200, 35, "Thanks for using our App. Servus and enjoy your camping days in the Alps!.", ln=True)
 
+    # Descargar PDF
     pdf_bytes = pdf.output(dest='S').encode('latin1')
     st.download_button("📥 Download PDF Report", data=pdf_bytes, file_name="kpi_report.pdf", mime="application/pdf")
