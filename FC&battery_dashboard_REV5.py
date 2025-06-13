@@ -262,7 +262,7 @@ if st.button("Generate PDF Performance Report"):
         except Exception as e:
             st.warning(f"⚠️ No se pudo insertar el wiring diagram en el PDF: {e}")
 
-    pdf.ln(16)
+    pdf.ln(12)
     pdf.set_font("Arial","B", size=8)
     pdf.cell(200, 3, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}. Values strictly estimated for academic purposes", ln=True)
     pdf.cell(200, 3, "Coder: Victor Alvarez Melendez", ln=True)
