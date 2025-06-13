@@ -205,7 +205,7 @@ if st.button("Generate PDF Performance Report"):
         pdf.cell(200, 6, f"{row['name']}: {row['power']}W x {row['hours']}h = {row['Energy (Wh)']:.0f}Wh | {row['Battery Capacity Used (Ah)']:.1f}Ah", ln=True)
 
     pdf.ln(4)
-    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/wiring_diagram_1.png", x=100, y=150, w=35)
+    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.PNG", x=100, y=4, w=80)
     pdf.set_font("Arial", "B", 11)
     pdf.cell(200, 6, "System Constants", ln=True)
     pdf.set_font("Arial", size=10)
