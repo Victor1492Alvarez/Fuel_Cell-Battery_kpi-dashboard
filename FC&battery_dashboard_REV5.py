@@ -217,7 +217,7 @@ if st.button("Generate PDF Performance Report"):
     pdf.cell(10, 10, "Fuel Cell & Battery Performance System Report", ln=0)
     if logo_path and os.path.exists(logo_path):
         try:
-            pdf.image(logo_path, x=180, y=4, w=35)
+            pdf.image(logo_path, x=160, y=4, w=35)
         except Exception as e:
             st.warning(f"⚠️ No se pudo insertar el logo: {e}")
     pdf.ln(12)
@@ -259,8 +259,8 @@ if st.button("Generate PDF Performance Report"):
         try:
             pdf.ln(10)
             pdf.set_font("Arial", "B", 11)
-            pdf.cell(200, 6, "Wiring Diagram", ln=True)
-            pdf.image(diagram_path, x=100, y=100, w=100)
+            pdf.cell(100, 100, "Wiring Diagram", ln=True)
+            pdf.image(diagram_path, x=100, y=100, w=90)
         except Exception as e:
             st.warning(f"⚠️ No se pudo insertar el wiring diagram en el PDF: {e}")
 
