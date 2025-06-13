@@ -258,8 +258,6 @@ if st.button("Generate PDF Performance Report"):
     if diagram_downloaded and os.path.exists(diagram_path):
         try:
             pdf.ln(10)
-            pdf.set_font(100,100,"Arial", "B", 11)
-            pdf.cell(100, 100, "Wiring Diagram", ln=True)
             pdf.image(diagram_path, x=100, y=100, w=90)
         except Exception as e:
             st.warning(f"⚠️ No se pudo insertar el wiring diagram en el PDF: {e}")
