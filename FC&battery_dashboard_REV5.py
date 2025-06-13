@@ -184,7 +184,7 @@ if st.button("Generate PDF Performance Report"):
     pdf.set_auto_page_break(auto=False, margin=5)
     pdf.set_font("Arial", "B", 14)
     pdf.cell(10, 10, "Fuel Cell & Battery Performance System Report", ln=0)
-    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/wiring_diagram.PNG", x=100, y=4, w=80)
+    pdf.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/wiring_diagram_1.PNG", x=100, y=4, w=80)
     pdf.ln(12)
 
     pdf.set_font("Arial", "B", 11)
