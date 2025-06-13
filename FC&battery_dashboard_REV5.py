@@ -179,7 +179,19 @@ fig_eff.write_image("/tmp/efficiency_gauge.png")
 # PDF Report
 st.markdown("### 📄 Export Report as PDF")
 if st.button("Generate PDF Performance Report"):
-    # Descargar imagen adicional desde GitHub
+    # Descargar logo desde GitHub
+    logo_url = "https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.PNG"
+    logo_path = "/tmp/dashboard_logo.png"
+    try:
+        response = requests.get(logo_url)
+        response.raise_for_status()
+        with open(logo_path, "wb") as f:
+            f.write(response.content)
+    except Exception as e:
+        st.error(f"❌ No se pudo descargar el logo del dashboard: {e}")
+        logo_path = None
+
+    # Descargar imagen adicional desde GitHub (wiring diagram)
     diagram_url = "https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/wiring_diagram_1.jpg"
     diagram_path = "/tmp/wiring_diagram_1.jpg"
     try:
@@ -188,7 +200,7 @@ if st.button("Generate PDF Performance Report"):
         with open(diagram_path, "wb") as f:
             f.write(response.content)
     except Exception as e:
-        st.error(f"❌ Error al descargar el wiring diagram: {e}")
+        st.error(f"❌ No se pudo descargar el wiring diagram: {e}")
         diagram_path = None
 
     # Crear PDF
@@ -197,7 +209,8 @@ if st.button("Generate PDF Performance Report"):
     pdf.set_auto_page_break(auto=False, margin=5)
     pdf.set_font("Arial", "B", 14)
     pdf.cell(10, 10, "Fuel Cell & Battery Performance System Report", ln=0)
-    pdf.image("/tmp/dashboard_logo.png", x=100, y=4, w=80)
+    if logo_path:
+        pdf.image(logo_path, x=100, y=4, w=80)
     pdf.ln(12)
 
     pdf.set_font("Arial", "B", 11)
