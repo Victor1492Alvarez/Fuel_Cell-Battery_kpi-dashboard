@@ -179,7 +179,9 @@ fig_eff.write_image("/tmp/efficiency_gauge.png")
 # PDF Report
 st.markdown("### 📄 Export Report as PDF")
 if st.button("Generate PDF Performance Report"):
-    # Descargar logo desde GitHub
+    import os
+
+    # Descargar logo
     logo_url = "https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.PNG"
     logo_path = "/tmp/dashboard_logo.png"
     try:
@@ -191,17 +193,21 @@ if st.button("Generate PDF Performance Report"):
         st.error(f"❌ No se pudo descargar el logo del dashboard: {e}")
         logo_path = None
 
-    # Descargar imagen adicional desde GitHub (wiring diagram)
-    diagram_url = "https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/wiring_diagram_1.jpg"
-    diagram_path = "/tmp/wiring_diagram_1.jpg"
+    # Descargar diagrama wiring (PNG)
+    diagram_url = "https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/wiring_diagram_1.png"
+    diagram_path = "/tmp/wiring_diagram_1.png"
+    diagram_downloaded = False
     try:
         response = requests.get(diagram_url)
         response.raise_for_status()
-        with open(diagram_path, "wb") as f:
-            f.write(response.content)
+        if "image" in response.headers.get("Content-Type", ""):
+            with open(diagram_path, "wb") as f:
+                f.write(response.content)
+            diagram_downloaded = True
+        else:
+            st.error("⚠️ La URL del diagrama no contiene una imagen PNG válida.")
     except Exception as e:
-        st.error(f"❌ No se pudo descargar el wiring diagram: {e}")
-        diagram_path = None
+        st.error(f"❌ Error al descargar el wiring diagram: {e}")
 
     # Crear PDF
     pdf = FPDF()
@@ -209,8 +215,11 @@ if st.button("Generate PDF Performance Report"):
     pdf.set_auto_page_break(auto=False, margin=5)
     pdf.set_font("Arial", "B", 14)
     pdf.cell(10, 10, "Fuel Cell & Battery Performance System Report", ln=0)
-    if logo_path:
-        pdf.image(logo_path, x=100, y=4, w=80)
+    if logo_path and os.path.exists(logo_path):
+        try:
+            pdf.image(logo_path, x=100, y=4, w=80)
+        except Exception as e:
+            st.warning(f"⚠️ No se pudo insertar el logo: {e}")
     pdf.ln(12)
 
     pdf.set_font("Arial", "B", 11)
@@ -245,12 +254,15 @@ if st.button("Generate PDF Performance Report"):
     pdf.set_font("Arial", size=8)
     pdf.cell(200, 6, "The gauges show key metrics for system autonomy and energy conversion efficiency.", ln=True)
 
-    # ⬇️ Wiring Diagram
-    if diagram_path:
-        pdf.ln(10)
-        pdf.set_font("Arial", "B", 11)
-        pdf.cell(200, 6, "Wiring Diagram", ln=True)
-        pdf.image(diagram_path, x=10, y=pdf.get_y(), w=190)
+    # ✅ Agregar el wiring diagram solo si es válido
+    if diagram_downloaded and os.path.exists(diagram_path):
+        try:
+            pdf.ln(10)
+            pdf.set_font("Arial", "B", 11)
+            pdf.cell(200, 6, "Wiring Diagram", ln=True)
+            pdf.image(diagram_path, x=10, y=pdf.get_y(), w=190)
+        except Exception as e:
+            st.warning(f"⚠️ No se pudo insertar el diagrama en el PDF: {e}")
 
     pdf.ln(16)
     pdf.set_font("Arial","B", size=8)
@@ -260,6 +272,6 @@ if st.button("Generate PDF Performance Report"):
     pdf.cell(200, 3, "Technische Hochschule Rosenheim - Campus Burghausen", ln=True)
     pdf.cell(200, 35, "Thanks for using our App. Servus and enjoy your camping days in the Alps!.", ln=True)
 
-    # Descargar PDF
+    # Descargar PDF final
     pdf_bytes = pdf.output(dest='S').encode('latin1')
     st.download_button("📥 Download PDF Report", data=pdf_bytes, file_name="kpi_report.pdf", mime="application/pdf")
