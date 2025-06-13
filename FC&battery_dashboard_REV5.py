@@ -180,8 +180,10 @@ fig_eff.write_image("/tmp/efficiency_gauge.png")
 st.markdown("### 📄 Export Report as PDF")
 if st.button("Generate PDF Performance Report"):
     import os
+    from PIL import Image
+    import io
 
-    # Descargar logo
+    # Descargar logo del dashboard
     logo_url = "https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.PNG"
     logo_path = "/tmp/dashboard_logo.png"
     try:
@@ -193,21 +195,19 @@ if st.button("Generate PDF Performance Report"):
         st.error(f"❌ No se pudo descargar el logo del dashboard: {e}")
         logo_path = None
 
-    # Descargar diagrama wiring (PNG)
-    diagram_url = "https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/IMG_0384.jpg"
-    diagram_path = "/tmp/IMG_0384.jpg"
+    # Descargar y convertir el wiring diagram a PNG válido
+    diagram_url = "https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/wiring_diagram_1.png"
+    diagram_path = "/tmp/wiring_diagram_1_converted.png"
     diagram_downloaded = False
     try:
         response = requests.get(diagram_url)
         response.raise_for_status()
-        if "image" in response.headers.get("Content-Type", ""):
-            with open(diagram_path, "wb") as f:
-                f.write(response.content)
-            diagram_downloaded = True
-        else:
-            st.error("⚠️ La URL del diagrama no contiene una imagen PNG válida.")
+        image = Image.open(io.BytesIO(response.content))
+        image = image.convert("RGB")  # Asegura compatibilidad
+        image.save(diagram_path, format="PNG")
+        diagram_downloaded = True
     except Exception as e:
-        st.error(f"❌ Error al descargar el wiring diagram: {e}")
+        st.error(f"❌ Error al descargar o convertir el wiring diagram: {e}")
 
     # Crear PDF
     pdf = FPDF()
@@ -254,7 +254,7 @@ if st.button("Generate PDF Performance Report"):
     pdf.set_font("Arial", size=8)
     pdf.cell(200, 6, "The gauges show key metrics for system autonomy and energy conversion efficiency.", ln=True)
 
-    # ✅ Agregar el wiring diagram solo si es válido
+    # Insertar wiring diagram convertido
     if diagram_downloaded and os.path.exists(diagram_path):
         try:
             pdf.ln(10)
@@ -262,7 +262,7 @@ if st.button("Generate PDF Performance Report"):
             pdf.cell(200, 6, "Wiring Diagram", ln=True)
             pdf.image(diagram_path, x=10, y=pdf.get_y(), w=190)
         except Exception as e:
-            st.warning(f"⚠️ No se pudo insertar el diagrama en el PDF: {e}")
+            st.warning(f"⚠️ No se pudo insertar el wiring diagram en el PDF: {e}")
 
     pdf.ln(16)
     pdf.set_font("Arial","B", size=8)
