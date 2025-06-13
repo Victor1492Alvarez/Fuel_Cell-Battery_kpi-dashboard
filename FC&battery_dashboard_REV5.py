@@ -177,7 +177,7 @@ fig_batt.write_image("/tmp/battery_gauge.png")
 fig_eff.write_image("/tmp/efficiency_gauge.png")
 
 # PDF Report
-st.markdown("### 📄 Export Full Report as PDF")
+st.markdown("### 📄 Export Report as PDF")
 if st.button("Generate PDF Performance Report"):
     pdf = FPDF()
     pdf.add_page()
@@ -228,4 +228,4 @@ if st.button("Generate PDF Performance Report"):
     pdf.cell(200, 35, "Thanks for using our App. Servus and enjoy your camping days in the Alps!.", ln=True)
 
     pdf_bytes = pdf.output(dest='S').encode('latin1')
-    st.download_button("📥 Download PDF Report", data=pdf_bytes, file_name="efoy_kpi_report.pdf", mime="application/pdf")
+    st.download_button("📥 Download PDF Report", data=pdf_bytes, file_name="kpi_report.pdf", mime="application/pdf")
