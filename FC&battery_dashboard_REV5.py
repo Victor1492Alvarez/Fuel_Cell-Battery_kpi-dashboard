@@ -213,8 +213,8 @@ if st.button("Generate PDF Performance Report"):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_auto_page_break(auto=False, margin=5)
-    pdf.set_font("Arial", "B", 14)
-    pdf.cell(10, 10, "Fuel Cell & Battery Performance System Report", ln=0)
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(10, 10, "Fuel Cell & Battery System Performance Report", ln=0)
     if logo_path and os.path.exists(logo_path):
         try:
             pdf.image(logo_path, x=166, y=5, w=40)
