@@ -49,8 +49,8 @@ if scenario == "Base 500 W":
     ]
 elif scenario == "Moderate 750 W":
     appliances = [
-        {"name": "Laptop (230 V)", "power": 15, "hours": 4},
-        {"name": "Led Lighting (12 V)", "power": 95, "hours": 6},
+        {"name": "Laptop (230 V)", "power": 95, "hours": 4},
+        {"name": "Led Lighting (12 V)", "power": 15, "hours": 6},
         {"name": "Cool box (12 V)", "power": 60, "hours": 8},
         {"name": "Bed warmer (12 V)", "power": 240, "hours": 3},
         {"name": "Smartphone (3 chargers)", "power": 35, "hours": 2},
@@ -59,8 +59,8 @@ elif scenario == "Moderate 750 W":
     ]
 else:
     appliances = [
-        {"name": "Laptop (230 V)", "power": 15, "hours": 4},
-        {"name": "Led Lighting (12 V)", "power": 95, "hours": 6},
+        {"name": "Laptop (230 V)", "power": 95, "hours": 4},
+        {"name": "Led Lighting (12 V)", "power": 15, "hours": 6},
         {"name": "Cool box (12 V)", "power": 60, "hours": 8},
         {"name": "Fan Heater (12 V)", "power": 490, "hours": 2},
         {"name": "Smartphone (3 chargers)", "power": 35, "hours": 2},
