@@ -16,8 +16,6 @@ st.title("🔋 Camping Truck KPI Dashboard")
 col1, col2 = st.columns([4, 1])
 with col1:
     st.subheader("DMFC & Battery System Performance Analyzer")
-with col2:
-    st.image("https://raw.githubusercontent.com/Victor1492Alvarez/Fuel_Cell-Battery_kpi-dashboard/main/dashboard_logo.PNG", width=180)
 
 # 🔹 Help Section 1: App Introduction
 with st.expander("ℹ️ About This App"):
