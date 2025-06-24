@@ -1,9 +1,8 @@
-streamlit
-matplotlib==3.6.3
-fpdf
+streamlit==1.32.0
 pandas==1.5.3
-requests==2.31.0
+matplotlib==3.6.3
 plotly==5.18.0
 kaleido==0.2.1
 fpdf==1.7.2
-pillow
+Pillow==10.3.0
+requests==2.31.0
