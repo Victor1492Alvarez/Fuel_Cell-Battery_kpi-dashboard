@@ -183,7 +183,7 @@ fig_eff.write_image(tmp_eff.name)
 st.markdown("### 📄 Export Report as PDF")
 if st.button("Generate PDF Performance Report"):
     import os
-    from PIL import Image
+    #from PIL import Image --this line is commented on 24.06.2025 due to conflicts.
     import io
 
     # Descargar logo del dashboard
@@ -205,13 +205,11 @@ if st.button("Generate PDF Performance Report"):
     try:
         response = requests.get(diagram_url)
         response.raise_for_status()
-        image = Image.open(io.BytesIO(response.content))
-        image = image.convert("RGB")  # Asegura compatibilidad
-        image.save(diagram_path, format="PNG")
+        with open(diagram_path, "wb") as f:
+            f.write(response.content)
         diagram_downloaded = True
     except Exception as e:
-        st.error(f"❌ Error al descargar o convertir el wiring diagram: {e}")
-
+        st.error(f"❌ Error al descargar el wiring diagram: {e}")
     # Crear PDF
     pdf = FPDF()
     pdf.add_page()
