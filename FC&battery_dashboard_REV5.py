@@ -11,6 +11,10 @@ import os
 from kpi_calculator_version2 import *
 import plotly.graph_objects as go
 
+# Cache cleaning
+st.cache_data.clear()
+st.cache_resource.clear()
+
 st.set_page_config(page_title="DMFC&Battery System Dashboard", layout="wide")
 st.title("🔋 Camping Truck KPI Dashboard")
 
