@@ -4,5 +4,5 @@ fpdf
 pandas
 Pillow
 plotly
-kaleido
+kaleido>=0.2.1
 requests
