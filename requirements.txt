@@ -5,4 +5,4 @@ pandas==1.5.3
 requests==2.31.0
 plotly==5.16.1
 kaleido==0.2.1
-pillow==10.2.0
+pillow==10.1.0
