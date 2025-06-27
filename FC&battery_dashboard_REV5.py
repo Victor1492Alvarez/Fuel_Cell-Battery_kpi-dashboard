@@ -29,6 +29,8 @@ with st.expander("ℹ️ About This App"):
 
     🔍 Objective: Estimate energy needs and analyze autonomy, methanol consumption and system efficiency under three typical camping scenarios: Base, Moderate, and Peak Load.
 
+    ℹ️ This App was strictly developed by students for students using literature and web references. It is aimed only for academic porpuses. 
+
     🛠️ Tip: Use the sidebar at the left to explore different usage patterns by adjusting the operating hours of each device and tanks!.
     """)
 
