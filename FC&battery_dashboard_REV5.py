@@ -39,7 +39,7 @@ st.sidebar.header("Adjust Scenarios and Methanol Storage")
 scenario = st.sidebar.selectbox("Select Load Scenario", ["Base 500 W", "Moderate 750 W", "Peak 1000 W"])
 
 # Sidebar - Methanol Tank Size Selection
-tank_option = st.sidebar.selectbox("Select Methanol Tank", ["M5 - 5 L", "M10 - 10 L", "M20 - 20 L"])
+tank_option = st.sidebar.selectbox("Select Methanol Tank", ["T5 - 5 L", "T10 - 10 L", "T20 - 20 L"])
 tank_liters = int(tank_option.split('-')[1].strip().split(' ')[0])
 
 # Define appliances by scenario
