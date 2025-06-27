@@ -141,6 +141,7 @@ with st.expander("📊 How to interpret the chart gauges"):
     st.markdown("""
                 The Battery Autonomy gauge estimates how long your system can run just on the battery power before requiring recharging. 
                 The System Efficiency gauge reflects how effectively methanol fuel is converted into usable electrical energy across the system.
+                This indicator considers both, the Battery and Fuel Cell efficiencies.
                 """)
 # 📊 Gauges
 fig_batt = go.Figure(go.Indicator(
